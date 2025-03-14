@@ -35,6 +35,16 @@ add_executable(${PROJECT_NAME}
     ${SRC_DIR}/main.cpp
     ${SRC_FILES}
     ${HEADER_FILES}
+        include/BackgroundImage.hpp
+        include/LevelManager.hpp
+        src/LevelManager.cpp
+        include/Character.hpp
+        src/Character.cpp
+        include/Entity.hpp
+        src/Entity.cpp
+        include/Ball.hpp
+        src/Ball.cpp
+
 )
 
 if(MSVC)

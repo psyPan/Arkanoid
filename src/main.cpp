@@ -1,9 +1,10 @@
 #include "App.hpp"
 
 #include "Core/Context.hpp"
-
+#include <iostream>
 int main(int, char**) {
     auto context = Core::Context::GetInstance();
+
     App app;
 
     while (!context->GetExit()) {
