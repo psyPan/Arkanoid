@@ -6,7 +6,7 @@
 
 #include <iostream>
 #include <ostream>
-
+#include <cmath>
 #include "Util/Image.hpp"
 
 
@@ -18,7 +18,6 @@ Character::Character(const std::string& ImagePath) {
 
 void Character::SetImage(const std::string& ImagePath) {
     m_ImagePath = ImagePath;
-
     m_Drawable = std::make_shared<Util::Image>(m_ImagePath);
 }
 
@@ -43,18 +42,33 @@ bool Character::CollideWithBall(const std::shared_ptr<Ball>& ball) const{
 
 }
 
-void Character::HandleCollisionWithBall(const std::shared_ptr<Ball>& ball){
-    // Simple bounce
+// Constants
+const float MAX_BOUNCE_ANGLE = M_PI / 3.2; // 60 degrees
+
+
+void Character::HandleCollisionWithBall(const std::shared_ptr<Ball>& ball) {
     ball->SetVelocity(glm::vec2{ball->GetVelocity().x, -ball->GetVelocity().y});
-    float relative_pos_x = ball->GetPosition().x - GetPosition().x;
-    std::cout << "relative_pos_x: " << relative_pos_x << std::endl;
-    float coeff = relative_pos_x / GetScaledSize().x;
-    std::cout << "coeff: " << coeff << std::endl;
-    float angle = coeff * (M_PI / 2.4);
-    std::cout << "Before rotate: " << std::endl;
-    std::cout << "Velocity X " <<ball->GetVelocity().x << std::endl;
-    std::cout << "Velocity Y " <<ball->GetVelocity().y << std::endl;
-    ball->SetVelocity(ball->Rotate(angle));
-    std::cout << "Velocity X " <<ball->GetVelocity().x << std::endl;
-    std::cout << "Velocity Y " <<ball->GetVelocity().y << std::endl;
+    // Calculate the relative position of the ball's impact on the paddle
+    float relativeIntersectX = (ball->GetPosition().x - GetPosition().x) / (GetScaledSize().x / 2);
+
+    // Clamp the value to the range [-1, 1]
+    relativeIntersectX = std::max(-1.0f, std::min(1.0f, relativeIntersectX));
+
+    // Calculate the bounce angle
+    float bounceAngle = relativeIntersectX * MAX_BOUNCE_ANGLE;
+
+    // Calculate the new velocity components
+    float current_speed = glm::length(ball->GetVelocity());
+    float new_speed = 1.1 * current_speed;
+    if (new_speed > ball->GetMaxSpeed()){
+        new_speed = ball->GetMaxSpeed();
+    }
+    glm::vec2 newVelocity;
+
+    // Increase speed a little
+    newVelocity.x = new_speed * std::sin(bounceAngle);
+    newVelocity.y = new_speed * std::cos(bounceAngle);
+
+    // Set the new velocity
+    ball->SetVelocity(newVelocity);
 }

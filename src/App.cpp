@@ -61,6 +61,7 @@ void App::Update() {
     }
 
     if (!m_Ball->IsSticky()){
+        // std::cout << "Inside not sticky" << std::endl;
         m_Ball->SetPosition({m_Ball->GetPosition().x + (m_Ball->GetVelocity().x * m_Time.GetDeltaTime()), m_Ball->GetPosition().y + (m_Ball->GetVelocity().y * m_Time.GetDeltaTime())});
         // "speed * GetDeltaTime" to have uniform speed on PCs with different FPS.
     }
@@ -83,6 +84,7 @@ void App::Update() {
     }
 
     if (m_Vaus->CollideWithBall(m_Ball)) {
+        std::cout << "Collision detected" << std::endl;
         m_Vaus->HandleCollisionWithBall(m_Ball);
 
     }

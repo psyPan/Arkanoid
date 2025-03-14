@@ -12,10 +12,11 @@ class Ball : public Entity{
 private:
     bool m_isSticky;
     glm::vec2 m_velocity;
+    float m_maxSpeed;
 
 public:
     explicit Ball(const std::string& ImagePath, const bool& IsSticky, const glm::vec2& velocity)
-        : Entity(ImagePath), m_isSticky(IsSticky), m_velocity(velocity) {};
+        : Entity(ImagePath), m_isSticky(IsSticky), m_velocity(velocity), m_maxSpeed(glm::length(velocity) * 2) {};
 
     bool IsSticky() const { return m_isSticky; }
 
@@ -26,6 +27,8 @@ public:
     void SetVelocity(const glm::vec2& velocity) {m_velocity = velocity;}
 
     glm::vec2 Rotate(const float& angle);
+
+    float GetMaxSpeed() const { return m_maxSpeed; }
 
     // void IncreaseVelocity(const float& Increase) {m_velocity += Increase;}
     //
