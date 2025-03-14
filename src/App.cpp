@@ -20,7 +20,7 @@ void App::Start() {
     m_Root.AddChild(m_Vaus);
 
     // Ball
-    m_Ball = std::make_shared<Ball>(RESOURCE_DIR"/Image/Ball/ball.png", true, glm::vec2{300,300});
+    m_Ball = std::make_shared<Ball>(RESOURCE_DIR"/Image/Ball/ball.png", true, glm::vec2{200,200});
     m_Ball->SetZIndex(50);
     m_Ball->SetPosition({m_Vaus->GetPosition().x + 10, m_Vaus->GetPosition().y + m_Vaus->GetScaledSize().y/2 + m_Ball->GetScaledSize().y/2});
     m_Ball->SetVisible(true);
@@ -52,7 +52,7 @@ void App::Update() {
 
     // m_ball is sticky or not
     if (m_Ball->IsSticky()){
-        m_Ball->SetPosition({m_Vaus->GetPosition().x + 10, m_Vaus->GetPosition().y + m_Vaus->GetScaledSize().y/2 + m_Ball->GetScaledSize().y/2});
+        m_Ball->SetPosition({m_Vaus->GetPosition().x + 5, m_Vaus->GetPosition().y + m_Vaus->GetScaledSize().y/2 + m_Ball->GetScaledSize().y/2});
 
         if (Util::Input::IsKeyPressed(Util::Keycode::SPACE)){
             m_Ball->SetIsSticky(false);

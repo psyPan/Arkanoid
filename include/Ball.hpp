@@ -16,7 +16,7 @@ private:
 
 public:
     explicit Ball(const std::string& ImagePath, const bool& IsSticky, const glm::vec2& velocity)
-        : Entity(ImagePath), m_isSticky(IsSticky), m_velocity(velocity), m_maxSpeed(glm::length(velocity) * 2) {};
+        : Entity(ImagePath), m_isSticky(IsSticky), m_velocity(velocity), m_maxSpeed(900.0f) {};
 
     bool IsSticky() const { return m_isSticky; }
 
