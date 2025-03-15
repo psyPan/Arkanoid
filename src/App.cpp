@@ -20,9 +20,9 @@ void App::Start() {
     m_Root.AddChild(m_Vaus);
 
     // Ball
-    m_Ball = std::make_shared<Ball>(RESOURCE_DIR"/Image/Ball/ball.png", true, glm::vec2{200,200});
+    m_Ball = std::make_shared<Ball>(RESOURCE_DIR"/Image/Ball/ball.png", true, glm::vec2{100,300});
     m_Ball->SetZIndex(50);
-    m_Ball->SetPosition({m_Vaus->GetPosition().x + 10, m_Vaus->GetPosition().y + m_Vaus->GetScaledSize().y/2 + m_Ball->GetScaledSize().y/2});
+    m_Ball->SetPosition({m_Vaus->GetPosition().x, m_Vaus->GetPosition().y + m_Vaus->GetScaledSize().y/2 + m_Ball->GetScaledSize().y/2});
     m_Ball->SetVisible(true);
     m_Root.AddChild(m_Ball);
 
@@ -61,7 +61,6 @@ void App::Update() {
     }
 
     if (!m_Ball->IsSticky()){
-        // std::cout << "Inside not sticky" << std::endl;
         m_Ball->SetPosition({m_Ball->GetPosition().x + (m_Ball->GetVelocity().x * m_Time.GetDeltaTime()), m_Ball->GetPosition().y + (m_Ball->GetVelocity().y * m_Time.GetDeltaTime())});
         // "speed * GetDeltaTime" to have uniform speed on PCs with different FPS.
     }
@@ -84,7 +83,6 @@ void App::Update() {
     }
 
     if (m_Vaus->CollideWithBall(m_Ball)) {
-        std::cout << "Collision detected" << std::endl;
         m_Vaus->HandleCollisionWithBall(m_Ball);
 
     }

@@ -6,7 +6,6 @@
 
 #include <iostream>
 #include <ostream>
-#include <cmath>
 #include "Util/Image.hpp"
 
 
@@ -49,17 +48,23 @@ const float MAX_BOUNCE_ANGLE = M_PI / 3.2; // 60 degrees
 void Character::HandleCollisionWithBall(const std::shared_ptr<Ball>& ball) {
     ball->SetVelocity(glm::vec2{ball->GetVelocity().x, -ball->GetVelocity().y});
     // Calculate the relative position of the ball's impact on the paddle
-    float relativeIntersectX = (ball->GetPosition().x - GetPosition().x) / (GetScaledSize().x / 2);
-
+    float relativeIntersectX = (ball->GetPosition().x - GetPosition().x) / GetScaledSize().x;
     // Clamp the value to the range [-1, 1]
     relativeIntersectX = std::max(-1.0f, std::min(1.0f, relativeIntersectX));
-
     // Calculate the bounce angle
     float bounceAngle = relativeIntersectX * MAX_BOUNCE_ANGLE;
 
+    // Adjust angle
+    if (bounceAngle < 0 && bounceAngle > -0.4){
+        bounceAngle = -0.4;
+    }
+    if (bounceAngle > 0 && bounceAngle < 0.4){
+        bounceAngle = 0.4;
+    }
+
     // Calculate the new velocity components
     float current_speed = glm::length(ball->GetVelocity());
-    float new_speed = 1.1 * current_speed;
+    float new_speed =  1.1 * current_speed;
     if (new_speed > ball->GetMaxSpeed()){
         new_speed = ball->GetMaxSpeed();
     }
