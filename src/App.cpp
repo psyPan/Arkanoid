@@ -26,6 +26,9 @@ void App::Start() {
     m_Ball->SetVisible(true);
     m_Root.AddChild(m_Ball);
 
+    // Bricks
+    m_LevelManager->CreateBrick(m_Root);
+
 }
 
 void App::Update() {
@@ -86,6 +89,25 @@ void App::Update() {
         m_Vaus->HandleCollisionWithBall(m_Ball);
 
     }
+
+    auto& bricks = m_LevelManager->GetBricks();
+    for (auto it = bricks.begin(); it != bricks.end(); ) {
+        if ((*it)->CollideWithBall(m_Ball)) {
+            (*it)->HandleCollisionWithBall(m_Ball);
+            (*it)->DecreseHitCount();
+
+            if ((*it)->GetHitCount() == 0) {
+                (*it)->SetVisible(false);
+                m_Root.RemoveChild(*it); // Ensure this does not invalidate `it`
+                it = bricks.erase(it);   // Get valid iterator after erasing
+            } else {
+                ++it;
+            }
+        } else {
+            ++it;
+        }
+    }
+
 
 
     if (Util::Input::IsKeyUp(Util::Keycode::ESCAPE) ||

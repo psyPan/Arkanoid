@@ -43,7 +43,8 @@ add_executable(${PROJECT_NAME}
         include/Entity.hpp
         src/Entity.cpp
         include/Ball.hpp
-        src/Ball.cpp
+        include/Brick.hpp
+        src/Brick.cpp
 
 )
 

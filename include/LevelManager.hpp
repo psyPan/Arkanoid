@@ -5,15 +5,18 @@
 #ifndef LEVELMANAGER_HPP
 #define LEVELMANAGER_HPP
 #include <memory>
-
 #include "BackgroundImage.hpp"
+#include "Brick.hpp"
+#include "Util/Renderer.hpp"
 
 class LevelManager{
 private:
     std::shared_ptr<BackgroundImage> m_backgroundImage;
+    std::vector<std::shared_ptr<Brick>> m_bricks;
     int m_level = 1;
+    std::vector<std::vector<Brick::BRICK_TYPE>> m_layout;
 
-    public:
+public:
     LevelManager();
     // ~LevelManager();
     void NextLevel();
@@ -25,6 +28,18 @@ private:
     std::shared_ptr<BackgroundImage> GetBackgroundImage() const {
         return m_backgroundImage;
     }
+
+    int GetLevel() const{
+        return m_level;
+    }
+    static std::vector<std::vector<Brick::BRICK_TYPE>> Level1_layout;
+    void CreateBrick(Util::Renderer& m_Root);
+
+    std::vector<std::shared_ptr<Brick>>& GetBricks(){
+        return m_bricks;
+    }
+
+    void SetLevelLayout();
 };
 
 #endif //LEVELMANAGER_HPP

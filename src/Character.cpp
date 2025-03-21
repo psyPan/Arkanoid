@@ -3,8 +3,6 @@
 //
 
 #include "Character.hpp"
-
-#include <iostream>
 #include <ostream>
 #include "Util/Image.hpp"
 
@@ -42,7 +40,7 @@ bool Character::CollideWithBall(const std::shared_ptr<Ball>& ball) const{
 }
 
 // Constants
-const float MAX_BOUNCE_ANGLE = M_PI / 3.2; // 60 degrees
+const float MAX_BOUNCE_ANGLE = M_PI / 1.5; // 60 degrees
 
 
 void Character::HandleCollisionWithBall(const std::shared_ptr<Ball>& ball) {
@@ -62,7 +60,7 @@ void Character::HandleCollisionWithBall(const std::shared_ptr<Ball>& ball) {
         bounceAngle = 0.4;
     }
 
-    // Calculate the new velocity components
+    // Increase speed a little
     float current_speed = glm::length(ball->GetVelocity());
     float new_speed =  1.1 * current_speed;
     if (new_speed > ball->GetMaxSpeed()){
@@ -70,7 +68,8 @@ void Character::HandleCollisionWithBall(const std::shared_ptr<Ball>& ball) {
     }
     glm::vec2 newVelocity;
 
-    // Increase speed a little
+
+    // Calculate the new velocity components
     newVelocity.x = new_speed * std::sin(bounceAngle);
     newVelocity.y = new_speed * std::cos(bounceAngle);
 

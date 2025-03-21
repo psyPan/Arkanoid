@@ -16,7 +16,7 @@ private:
 
 public:
     explicit Ball(const std::string& ImagePath, const bool& IsSticky, const glm::vec2& velocity)
-        : Entity(ImagePath), m_isSticky(IsSticky), m_velocity(velocity), m_maxSpeed(900.0f) {};
+        : Entity(ImagePath), m_isSticky(IsSticky), m_velocity(velocity), m_maxSpeed(625.0f) {};
 
     bool IsSticky() const { return m_isSticky; }
 
@@ -26,17 +26,8 @@ public:
 
     void SetVelocity(const glm::vec2& velocity) {m_velocity = velocity;}
 
-    glm::vec2 Rotate(const float& angle);
-
     float GetMaxSpeed() const { return m_maxSpeed; }
 
-    // void IncreaseVelocity(const float& Increase) {m_velocity += Increase;}
-    //
-    // void DecreaseSpeedX(const float& SpeedX) { m_SpeedX -= SpeedX; }
-    // void DecreaseSpeedY(const float& SpeedY) { m_SpeedY -= SpeedY; }
-    //
-    // float GetRotationX(float angle);
-    // float GetRotationY(float angle);
 
 };
 
