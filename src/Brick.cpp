@@ -64,25 +64,3 @@ void Brick::HandleCollisionWithBall(const std::shared_ptr<Ball>& ball) {
     ball->SetVelocity(newVelocity);
 }
 
-// void Brick::HandleCollisionWithBall(const std::shared_ptr<Ball>& ball) {
-//     // Calculate the overlap on both axes
-//     float overlapX = (GetScaledSize().x / 2 + ball->GetScaledSize().x / 2) - std::abs(ball->GetPosition().x - GetPosition().x);
-//     float overlapY = (GetScaledSize().y / 2 + ball->GetScaledSize().y / 2) - std::abs(ball->GetPosition().y - GetPosition().y);
-//
-//     // Determine the side of collision
-//     if (overlapX < overlapY) {
-//         // Collision on the left or right side
-//         ball->SetVelocity(glm::vec2{-ball->GetVelocity().x, ball->GetVelocity().y});
-//     } else {
-//         // Collision on the top or bottom side
-//         ball->SetVelocity(glm::vec2{ball->GetVelocity().x, -ball->GetVelocity().y});
-//     }
-//
-//     // Increase speed slightly
-//     float currentSpeed = glm::length(ball->GetVelocity());
-//     float newSpeed = std::min(1.1f * currentSpeed, ball->GetMaxSpeed());
-//
-//     // Normalize the velocity and apply the new speed
-//     glm::vec2 newVelocity = glm::normalize(ball->GetVelocity()) * newSpeed;
-//     ball->SetVelocity(newVelocity);
-// }
