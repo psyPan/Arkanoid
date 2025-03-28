@@ -18,7 +18,6 @@ public:
     }
 
 
-
 private:
     inline std::string ImagePath(const int level) {
         return RESOURCE_DIR"/Image/Background/level" + std::to_string(level) + ".png";

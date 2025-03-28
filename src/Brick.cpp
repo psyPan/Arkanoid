@@ -32,7 +32,7 @@ const float MAX_BOUNCE_ANGLE = M_PI / 2.5; // 60 degrees
 
 void Brick::HandleCollisionWithBall(const std::shared_ptr<Ball>& ball) {
     ball->SetVelocity(glm::vec2{ball->GetVelocity().x, - ball->GetVelocity().y});
-    // Calculate the relative position of the ball's impact on the paddle
+    // Calculate the relative position of the ball's impact on the brick
     float relativeIntersectX = (GetPosition().x - ball->GetPosition().x) / GetScaledSize().x;
     // Clamp the value to the range [-1, 1]
     relativeIntersectX = std::max(-1.0f, std::min(1.0f, relativeIntersectX));
@@ -54,8 +54,6 @@ void Brick::HandleCollisionWithBall(const std::shared_ptr<Ball>& ball) {
         new_speed = ball->GetMaxSpeed();
     }
     glm::vec2 newVelocity;
-
-
     // Calculate the new velocity components
     newVelocity.x = - new_speed * std::sin(bounceAngle);
     newVelocity.y = - new_speed * std::cos(bounceAngle);
@@ -64,25 +62,3 @@ void Brick::HandleCollisionWithBall(const std::shared_ptr<Ball>& ball) {
     ball->SetVelocity(newVelocity);
 }
 
-// void Brick::HandleCollisionWithBall(const std::shared_ptr<Ball>& ball) {
-//     // Calculate the overlap on both axes
-//     float overlapX = (GetScaledSize().x / 2 + ball->GetScaledSize().x / 2) - std::abs(ball->GetPosition().x - GetPosition().x);
-//     float overlapY = (GetScaledSize().y / 2 + ball->GetScaledSize().y / 2) - std::abs(ball->GetPosition().y - GetPosition().y);
-//
-//     // Determine the side of collision
-//     if (overlapX < overlapY) {
-//         // Collision on the left or right side
-//         ball->SetVelocity(glm::vec2{-ball->GetVelocity().x, ball->GetVelocity().y});
-//     } else {
-//         // Collision on the top or bottom side
-//         ball->SetVelocity(glm::vec2{ball->GetVelocity().x, -ball->GetVelocity().y});
-//     }
-//
-//     // Increase speed slightly
-//     float currentSpeed = glm::length(ball->GetVelocity());
-//     float newSpeed = std::min(1.1f * currentSpeed, ball->GetMaxSpeed());
-//
-//     // Normalize the velocity and apply the new speed
-//     glm::vec2 newVelocity = glm::normalize(ball->GetVelocity()) * newSpeed;
-//     ball->SetVelocity(newVelocity);
-// }

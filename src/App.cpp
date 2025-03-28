@@ -85,11 +85,12 @@ void App::Update() {
         m_Ball->SetVelocity(glm::vec2{-m_Ball->GetVelocity().x, m_Ball->GetVelocity().y});
     }
 
+    // Collision between m_Vaus and m_Ball
     if (m_Vaus->CollideWithBall(m_Ball)) {
         m_Vaus->HandleCollisionWithBall(m_Ball);
-
     }
 
+    // Collision between each brick and m_Ball
     auto& bricks = m_LevelManager->GetBricks();
     for (auto it = bricks.begin(); it != bricks.end(); ) {
         if ((*it)->CollideWithBall(m_Ball)) {
@@ -107,8 +108,6 @@ void App::Update() {
             ++it;
         }
     }
-
-
 
     if (Util::Input::IsKeyUp(Util::Keycode::ESCAPE) ||
         Util::Input::IfExit()) {
