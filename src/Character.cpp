@@ -32,8 +32,8 @@ bool Character::CollideWithBall(const std::shared_ptr<Ball>& ball) const{
     float ballBottom = ball->GetPosition().y - ball->GetScaledSize().y / 2;
 
     // AABB Collision Check
-    bool isColliding = (vausRight > ballLeft && vausLeft < ballRight &&
-                        vausTop > ballBottom && vausBottom < ballTop);
+    bool isColliding = (vausRight >= ballLeft && vausLeft <= ballRight &&
+                        vausTop >= ballBottom && vausBottom <= ballTop);
 
     return isColliding;
 

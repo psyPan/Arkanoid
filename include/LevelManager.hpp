@@ -9,6 +9,7 @@
 #include "Brick.hpp"
 #include "Util/Renderer.hpp"
 
+
 class LevelManager{
 private:
     std::shared_ptr<BackgroundImage> m_backgroundImage;
@@ -40,6 +41,8 @@ public:
     }
 
     void SetLevelLayout();
+
+    std::shared_ptr<Brick> PrimaryCollidedBrick(const std::shared_ptr<Ball>& ball);
 };
 
 #endif //LEVELMANAGER_HPP

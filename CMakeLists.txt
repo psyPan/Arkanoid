@@ -45,6 +45,8 @@ add_executable(${PROJECT_NAME}
         include/Ball.hpp
         include/Brick.hpp
         src/Brick.cpp
+        include/Pill.hpp
+        src/Pill.cpp
 
 )
 

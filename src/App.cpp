@@ -13,7 +13,7 @@ void App::Start() {
     m_Root.AddChild(m_LevelManager->GetChild());
 
     // Vaus
-    m_Vaus = std::make_shared<Character>(RESOURCE_DIR"/Image/Vaus/Normal.png");
+    m_Vaus = std::make_shared<Character>(RESOURCE_DIR"/Image/Vaus/Normal0.png");
     m_Vaus->SetZIndex(50);
     m_Vaus->SetPosition({0, -300});
     m_Vaus->SetVisible(true);
@@ -91,21 +91,53 @@ void App::Update() {
     }
 
     // Collision between each brick and m_Ball
-    auto& bricks = m_LevelManager->GetBricks();
-    for (auto it = bricks.begin(); it != bricks.end(); ) {
-        if ((*it)->CollideWithBall(m_Ball)) {
-            (*it)->HandleCollisionWithBall(m_Ball);
-            (*it)->DecreseHitCount();
+    // auto& bricks = m_LevelManager->GetBricks();
+    // for (auto it = bricks.begin(); it != bricks.end(); ) {
+    //     if ((*it)->CollideWithBall(m_Ball)) {
+    //         (*it)->HandleCollisionWithBall(m_Ball);
+    //         (*it)->DecreseHitCount();
+    //
+    //         if ((*it)->GetHitCount() == 0) {
+    //             (*it)->SetVisible(false);
+    //
+    //             // Deciding if the brick should spawn pill or not.
+    //             if ((*it)->ShouldSpawnPowerUp((*it)->GetSpawnProbability())){
+    //                 std::cout << "Spawning PowerUp" << std::endl;
+    //             }
+    //             m_Root.RemoveChild(*it); // Ensure this does not invalidate `it`
+    //             it = bricks.erase(it);   // Get valid iterator after erasing
+    //         } else {
+    //             ++it;
+    //         }
+    //     } else {
+    //         ++it;
+    //     }
+    // }
 
-            if ((*it)->GetHitCount() == 0) {
-                (*it)->SetVisible(false);
-                m_Root.RemoveChild(*it); // Ensure this does not invalidate `it`
-                it = bricks.erase(it);   // Get valid iterator after erasing
-            } else {
-                ++it;
+    // Find the primary brick that the ball has collided with
+    std::shared_ptr<Brick> collidedBrick = m_LevelManager->PrimaryCollidedBrick(m_Ball);
+
+    if (collidedBrick) { // If there is a valid collided brick
+        collidedBrick->HandleCollisionWithBall(m_Ball);
+        collidedBrick->DecreseHitCount();
+
+        if (collidedBrick->GetHitCount() == 0) {
+            collidedBrick->SetVisible(false);
+
+            // Decide if the brick should spawn a power-up
+            if (collidedBrick->ShouldSpawnPowerUp(collidedBrick->GetSpawnProbability())) {
+                std::cout << "Spawning PowerUp" << std::endl;
             }
-        } else {
-            ++it;
+
+            // Remove the brick from the scene and level
+            m_Root.RemoveChild(collidedBrick);
+
+            // Find and erase the brick from the list
+            auto& bricks = m_LevelManager->GetBricks();
+            auto it = std::find(bricks.begin(), bricks.end(), collidedBrick); // it will be the primary collided brick.
+            if (it != bricks.end()) {
+                bricks.erase(it);
+            }
         }
     }
 

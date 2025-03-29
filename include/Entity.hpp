@@ -8,6 +8,23 @@
 #include <string>
 #include "Util/GameObject.hpp"
 
+struct AABB {
+    float left;   // The x-coordinate of the left edge
+    float right;  // The x-coordinate of the right edge
+    float top;    // The y-coordinate of the top edge
+    float bottom; // The y-coordinate of the bottom edge
+
+    // Constructor to initialize the AABB
+    AABB(float l, float r, float t, float b)
+        : left(l), right(r), top(t), bottom(b) {}
+
+    // Method to check if this AABB intersects with another AABB
+    bool Intersects(const AABB& other) const {
+        return !(right < other.left || left > other.right ||
+                 top < other.bottom || bottom > other.top);
+    }
+};
+
 class Entity : public Util::GameObject{
 private:
     std::string m_ImagePath;

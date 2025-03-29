@@ -2,6 +2,7 @@
 // Created by 潘雙永(HHA) on 2025/3/19.
 //
 #include "Brick.hpp"
+#include <random>
 Brick::Brick(const std::string& ImagePath) : Entity(ImagePath){
     SetVisible(true);
     SetZIndex(5);
@@ -21,8 +22,8 @@ bool Brick::CollideWithBall(const std::shared_ptr<Ball>& ball) const{
     float ballBottom = ball->GetPosition().y - ball->GetScaledSize().y / 2;
 
     // AABB Collision Check
-    bool isColliding = (brickRight > ballLeft && brickLeft < ballRight &&
-                        brickTop > ballBottom && brickBottom < ballTop);
+    bool isColliding = (brickRight >= ballLeft && brickLeft <= ballRight &&
+                        brickTop >= ballBottom && brickBottom <= ballTop);
 
     return isColliding;
 }
@@ -60,5 +61,28 @@ void Brick::HandleCollisionWithBall(const std::shared_ptr<Ball>& ball) {
 
     // Set the new velocity
     ball->SetVelocity(newVelocity);
+}
+
+bool Brick::ShouldSpawnPowerUp(double spawnProbability){
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    std::uniform_real_distribution<> dis(0.0, 1.0);
+    return dis(gen) < spawnProbability;
+}
+
+AABB Brick::GetBrickAABB() const{
+    float halfWidth = GetScaledSize().x / 2.0f;
+    float halfHeight = GetScaledSize().y / 2.0f;
+    return AABB(GetPosition().x - halfWidth, GetPosition().x + halfWidth,
+                GetPosition().y + halfHeight, GetPosition().y - halfHeight);
+}
+
+float Brick::CalculatePenetrationDepth(const std::shared_ptr<Ball>& ball){
+    float overlapX = std::min(ball->GetAABB().right, GetBrickAABB().right) - std::max(ball->GetAABB().left, GetBrickAABB().left);
+    float overlapY = std::min(ball->GetAABB().top, GetBrickAABB().top) - std::max(ball->GetAABB().bottom, GetBrickAABB().bottom);
+    if (overlapX > 0 && overlapY > 0){
+        return overlapX * overlapY; // Area of overlap
+    }
+    return 0.0f; // No overlap
 }
 

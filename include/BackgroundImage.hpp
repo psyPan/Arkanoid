@@ -9,7 +9,7 @@
 #include <iostream>
 class BackgroundImage : public Util::GameObject{
 public:
-    BackgroundImage() : GameObject(std::make_unique<Util::Image>(RESOURCE_DIR"/Image/Background/Level4.png"), -10) {
+    BackgroundImage() : GameObject(std::make_unique<Util::Image>(RESOURCE_DIR"/Image/Background/Level1.png"), -10) {
 
     }
     void NextLevel(const int level) {

@@ -33,8 +33,33 @@ public:
     void DecreseHitCount() { m_hitCount--; }
 
     int GetHitCount() const { return m_hitCount; }
+
+    bool ShouldSpawnPowerUp(double spawnProbability);
+
+    void SetSpawnProbability(double probability) { m_spawnProbability = probability; }
+
+    double GetSpawnProbability() const { return m_spawnProbability; }
+
+    AABB GetBrickAABB() const;
+
+    // Method to check if the brick is destroyed
+    bool IsDestroyed() const {
+        return m_isDestroyed;
+    }
+
+    // Method to handle the brick being hit
+    void OnHit() {
+        // Logic to handle the brick being hit (e.g., mark as destroyed)
+        m_isDestroyed = true;
+    }
+
+    float CalculatePenetrationDepth(const std::shared_ptr<Ball>& ball);
+
+
 private:
     int m_hitCount;
+    double m_spawnProbability;
+    bool m_isDestroyed = false;
 };
 
 

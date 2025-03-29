@@ -12,11 +12,12 @@ std::vector<std::vector<Brick::BRICK_TYPE>> LevelManager::Level1_layout =
     {Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::GREEN}
     };
 
-void SetupBricks(const std::string& path, std::vector<std::shared_ptr<Brick>>& m_bricks, Util::Renderer& m_Root,const glm::vec2& start_pos, int i, int j, int hitCount){
+void SetupBricks(const std::string& path, std::vector<std::shared_ptr<Brick>>& m_bricks, Util::Renderer& m_Root,const glm::vec2& start_pos, int i, int j, int hitCount, float spawnProbability = 0.2){
     std::shared_ptr<Brick> brick = std::make_shared<Brick>(path);
     glm::vec2 update_pos = glm::vec2{start_pos.x + j * brick->GetScaledSize().x, start_pos.y - i * brick->GetScaledSize().y};
     brick->SetHitCount(hitCount);
     brick->SetPosition(update_pos);
+    brick->SetSpawnProbability(spawnProbability);
     m_bricks.push_back(brick);
     m_Root.AddChild(brick);
 }
@@ -42,6 +43,25 @@ void LevelManager::SetLevelLayout(){
         default:
             m_layout = Level1_layout;
     }
+}
+
+std::shared_ptr<Brick> LevelManager::PrimaryCollidedBrick(const std::shared_ptr<Ball>& ball){
+    std::shared_ptr<Brick> primaryBrick = nullptr;
+    float maxPenetration = 0.0f;
+    AABB ballAABB = ball->GetAABB();
+    for (auto& brick : m_bricks){
+        if (brick->IsDestroyed())
+            continue;
+        AABB brickAABB = brick->GetBrickAABB();
+        if (ballAABB.Intersects(brickAABB)){
+            float penetration = brick->CalculatePenetrationDepth(ball);
+            if (penetration > maxPenetration){
+                maxPenetration = penetration;
+                primaryBrick = brick;
+            }
+        }
+    }
+    return primaryBrick;
 }
 
 void LevelManager::CreateBrick(Util::Renderer& m_Root){
