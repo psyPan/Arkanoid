@@ -6,6 +6,7 @@
 #define BRICK_HPP
 #include "Entity.hpp"
 #include "Ball.hpp"
+#include "Pill.hpp"
 
 class Brick : public Entity{
 public:
@@ -22,23 +23,17 @@ public:
         PINK,
         ORANGE,
     };
-    explicit Brick(const std::string& ImagePath);
+    explicit Brick(const std::string& ImagePath, Brick::BRICK_TYPE brickType);
 
     void SetHitCount(int hits) { m_hitCount = hits; }
 
-    bool CollideWithBall(const std::shared_ptr<Ball>& ball) const;
-
     void HandleCollisionWithBall(const std::shared_ptr<Ball>& ball);
 
-    void DecreseHitCount() { m_hitCount--; }
+    void DecreseHitCount(){
+        --m_hitCount;
+    }
 
     int GetHitCount() const { return m_hitCount; }
-
-    bool ShouldSpawnPowerUp(double spawnProbability);
-
-    void SetSpawnProbability(double probability) { m_spawnProbability = probability; }
-
-    double GetSpawnProbability() const { return m_spawnProbability; }
 
     AABB GetBrickAABB() const;
 
@@ -47,19 +42,29 @@ public:
         return m_isDestroyed;
     }
 
+    BRICK_TYPE GetBrickType() const { return m_brickType; }
+
     // Method to handle the brick being hit
     void OnHit() {
         // Logic to handle the brick being hit (e.g., mark as destroyed)
-        m_isDestroyed = true;
+        DecreseHitCount();
+        if (m_hitCount == 0){
+            m_isDestroyed = true;
+        }
     }
 
-    float CalculatePenetrationDepth(const std::shared_ptr<Ball>& ball);
+    float CalculatePenetrationArea(const std::shared_ptr<Ball>& ball);
+
+    glm::vec2 CalculatePenetrationDepth(const std::shared_ptr<Ball>& ball);
+
+    Pill::PILL_TYPE SpawnPill();
 
 
 private:
     int m_hitCount;
-    double m_spawnProbability;
     bool m_isDestroyed = false;
+    BRICK_TYPE m_brickType;
+
 };
 
 

@@ -10,7 +10,7 @@
 class Ball : public Entity{
 private:
     bool m_isSticky;
-    glm::vec2 m_velocity;
+    glm::vec2 m_velocity = glm::vec2{0};
     float m_maxSpeed;
 
 public:
@@ -26,15 +26,6 @@ public:
     void SetVelocity(const glm::vec2& velocity) {m_velocity = velocity;}
 
     float GetMaxSpeed() const { return m_maxSpeed; }
-
-    // Method to retrieve the ball's AABB
-    AABB GetAABB() const {
-        float halfWidth = GetScaledSize().x / 2.0f;
-        float halfHeight = GetScaledSize().y / 2.0f;
-        return AABB(GetPosition().x - halfWidth, GetPosition().x + halfWidth,
-                    GetPosition().y + halfHeight, GetPosition().y - halfHeight);
-    }
-
 
 };
 

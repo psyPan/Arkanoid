@@ -47,6 +47,8 @@ add_executable(${PROJECT_NAME}
         src/Brick.cpp
         include/Pill.hpp
         src/Pill.cpp
+        include/Laser.hpp
+        src/Laser.cpp
 
 )
 

@@ -8,6 +8,7 @@
 #include "Util/Renderer.hpp"
 #include "Entity.hpp"
 #include "Util/Time.hpp"
+#include "Pill.hpp"
 
 class App {
 public:
@@ -24,6 +25,16 @@ public:
     void Update();
 
     void End(); // NOLINT(readability-convert-member-functions-to-static)
+
+    void SetSpawningState(bool isSpawningPill) { this->isSpawningPill = isSpawningPill; }
+
+    bool IsSpawningPill() { return isSpawningPill; }
+
+    void CreatePill(const Pill::PILL_TYPE& pill, const glm::vec2& pos);
+
+    void VausPowerUp();
+
+    void OtherPowerUp();
 
 private:
     void ValidTask();
@@ -42,6 +53,13 @@ private:
 
     // Entity
     std::shared_ptr<Ball> m_Ball;
+
+    // Pill
+    std::shared_ptr<Pill> m_Pill;
+    bool isSpawningPill = false;
+    bool shouldReplaceVaus = false; // For Blue and Red powerup
+    bool otherPowerUp = false; // Except blue and red powerup
+    Pill::PILL_TYPE pendingPillType;
 };
 
 #endif

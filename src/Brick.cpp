@@ -2,52 +2,34 @@
 // Created by 潘雙永(HHA) on 2025/3/19.
 //
 #include "Brick.hpp"
+
+#include <iostream>
+#include <ostream>
 #include <random>
-Brick::Brick(const std::string& ImagePath) : Entity(ImagePath){
+Brick::Brick(const std::string& ImagePath,Brick::BRICK_TYPE brickType) : Entity(ImagePath), m_brickType(brickType){
     SetVisible(true);
     SetZIndex(5);
 }
 
-bool Brick::CollideWithBall(const std::shared_ptr<Ball>& ball) const{
-    // Get Vaus (Paddle) Bounding Box
-    float brickLeft   = GetPosition().x - GetScaledSize().x / 2;
-    float brickRight  = GetPosition().x + GetScaledSize().x / 2;
-    float brickTop    = GetPosition().y + GetScaledSize().y / 2;
-    float brickBottom = GetPosition().y - GetScaledSize().y / 2;
-
-    // Get Ball Bounding Box
-    float ballLeft   = ball->GetPosition().x - ball->GetScaledSize().x / 2;
-    float ballRight  = ball->GetPosition().x + ball->GetScaledSize().x / 2;
-    float ballTop    = ball->GetPosition().y + ball->GetScaledSize().y / 2;
-    float ballBottom = ball->GetPosition().y - ball->GetScaledSize().y / 2;
-
-    // AABB Collision Check
-    bool isColliding = (brickRight >= ballLeft && brickLeft <= ballRight &&
-                        brickTop >= ballBottom && brickBottom <= ballTop);
-
-    return isColliding;
-}
-
-const float MAX_BOUNCE_ANGLE = M_PI / 2.5; // 60 degrees
-
-
-void Brick::HandleCollisionWithBall(const std::shared_ptr<Ball>& ball) {
-    ball->SetVelocity(glm::vec2{ball->GetVelocity().x, - ball->GetVelocity().y});
-    // Calculate the relative position of the ball's impact on the brick
-    float relativeIntersectX = (GetPosition().x - ball->GetPosition().x) / GetScaledSize().x;
-    // Clamp the value to the range [-1, 1]
-    relativeIntersectX = std::max(-1.0f, std::min(1.0f, relativeIntersectX));
-    // Calculate the bounce angle
+const float MAX_BOUNCE_ANGLE = M_PI / 1.0; // 60 degrees
+void Brick::HandleCollisionWithBall(const std::shared_ptr<Ball>& ball){
+    glm::vec2 ballVel = ball->GetVelocity();
+    float relativeIntersectX = 0.0f;
+    if (ballVel.y > 0){
+        relativeIntersectX = (GetPosition().x - ball->GetPosition().x) / GetScaledSize().x;
+    }
+    else if (ballVel.y < 0){
+        relativeIntersectX = (ball->GetPosition().x - GetPosition().x) / GetScaledSize().x;
+    }
     float bounceAngle = relativeIntersectX * MAX_BOUNCE_ANGLE;
-
     // Adjust angle
-    if (bounceAngle < 0 && bounceAngle > -0.2){
-        bounceAngle = -0.2;
+    if (bounceAngle < 0 && bounceAngle > -0.7){
+        bounceAngle = -0.7;
     }
-    if (bounceAngle > 0 && bounceAngle < 0.2){
-        bounceAngle = 0.2;
+    if (bounceAngle > 0 && bounceAngle < 0.7){
+        bounceAngle = 0.7;
     }
-
+    bounceAngle = std::max(-1.5f, std::min(1.5f, relativeIntersectX));
     // Increase speed a little
     float current_speed = glm::length(ball->GetVelocity());
     float new_speed =  1.05 * current_speed;
@@ -56,18 +38,25 @@ void Brick::HandleCollisionWithBall(const std::shared_ptr<Ball>& ball) {
     }
     glm::vec2 newVelocity;
     // Calculate the new velocity components
-    newVelocity.x = - new_speed * std::sin(bounceAngle);
-    newVelocity.y = - new_speed * std::cos(bounceAngle);
-
-    // Set the new velocity
+    if (ballVel.y > 0){
+        if (ballVel.x > 0){
+            newVelocity.x = - new_speed * std::sin(bounceAngle);
+        }
+        else if (ballVel.x < 0){
+            newVelocity.x = - new_speed * std::sin(bounceAngle);
+        }
+        newVelocity.y = - new_speed * std::cos(bounceAngle);
+    }
+    else if (ballVel.y < 0){
+        if (ballVel.x > 0){
+            newVelocity.x = - new_speed * std::sin(bounceAngle * 1.1);
+        }
+        else if (ballVel.x < 0){
+            newVelocity.x = - new_speed * std::sin(bounceAngle * 1.1);
+        }
+        newVelocity.y =  new_speed * std::cos(bounceAngle);
+    }
     ball->SetVelocity(newVelocity);
-}
-
-bool Brick::ShouldSpawnPowerUp(double spawnProbability){
-    static std::random_device rd;
-    static std::mt19937 gen(rd());
-    std::uniform_real_distribution<> dis(0.0, 1.0);
-    return dis(gen) < spawnProbability;
 }
 
 AABB Brick::GetBrickAABB() const{
@@ -77,7 +66,7 @@ AABB Brick::GetBrickAABB() const{
                 GetPosition().y + halfHeight, GetPosition().y - halfHeight);
 }
 
-float Brick::CalculatePenetrationDepth(const std::shared_ptr<Ball>& ball){
+float Brick::CalculatePenetrationArea(const std::shared_ptr<Ball>& ball){
     float overlapX = std::min(ball->GetAABB().right, GetBrickAABB().right) - std::max(ball->GetAABB().left, GetBrickAABB().left);
     float overlapY = std::min(ball->GetAABB().top, GetBrickAABB().top) - std::max(ball->GetAABB().bottom, GetBrickAABB().bottom);
     if (overlapX > 0 && overlapY > 0){
@@ -85,4 +74,48 @@ float Brick::CalculatePenetrationDepth(const std::shared_ptr<Ball>& ball){
     }
     return 0.0f; // No overlap
 }
+
+glm::vec2 Brick::CalculatePenetrationDepth(const std::shared_ptr<Ball>& ball){
+    AABB ballAABB = ball->GetAABB();
+    AABB brickAABB = GetBrickAABB();
+
+    float penetrationX = std::min(brickAABB.right - ballAABB.left, ballAABB.right - brickAABB.left);
+    float penetrationY = std::min(brickAABB.top - ballAABB.bottom, ballAABB.top - brickAABB.bottom);
+
+    return glm::vec2(penetrationX, penetrationY);
+}
+
+Pill::PILL_TYPE Brick::SpawnPill(){
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> dis(0, 1);
+    double randomValue = dis(gen);
+    // Define the probabilities
+    const double p_blue = 0.25;
+    const double p_red = 0.25;
+    const double p_light_blue = 0.2;
+    const double p_green = 0.1;
+    const double p_orange = 0.1;
+    const double p_gray = 0.05;
+    const double p_pink = 0.05;
+
+    if (randomValue < p_blue){
+        return Pill::PILL_TYPE::BLUE;
+    }
+    else if (randomValue < p_blue + p_red) {
+        return Pill::PILL_TYPE::RED;
+    } else if (randomValue < p_blue + p_red + p_light_blue) {
+        return Pill::PILL_TYPE::LIGHTBLUE;
+    } else if (randomValue < p_blue + p_red + p_light_blue + p_green) {
+        return Pill::PILL_TYPE::GREEN;
+    } else if (randomValue < p_blue + p_red + p_light_blue + p_green + p_orange) {
+        return Pill::PILL_TYPE::ORANGE;
+    } else if (randomValue < p_blue + p_red + p_light_blue + p_green + p_orange + p_gray) {
+        return Pill::PILL_TYPE::GREY;
+    } else {
+        return Pill::PILL_TYPE::PINK;
+    }
+}
+
+
 

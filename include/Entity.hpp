@@ -31,7 +31,7 @@ private:
     void ResetPosition() { m_Transform.translation = {0, 0}; }
 
 public:
-    explicit Entity(const std::string& ImagePath);
+    Entity(const std::string& ImagePath);
 
     Entity(const Entity&) = delete;
 
@@ -50,6 +50,13 @@ public:
     void SetImage(const std::string& ImagePath);
 
     void SetPosition(const glm::vec2& Position) { m_Transform.translation = Position; }
+
+    AABB GetAABB() const {
+        float halfWidth = GetScaledSize().x / 2.0f;
+        float halfHeight = GetScaledSize().y / 2.0f;
+        return AABB(GetPosition().x - halfWidth, GetPosition().x + halfWidth,
+                    GetPosition().y + halfHeight, GetPosition().y - halfHeight);
+    }
 
 };
 

@@ -8,7 +8,10 @@
 #include <string>
 
 #include "Util/GameObject.hpp"
+#include "Util/Renderer.hpp"
 #include "Ball.hpp"
+#include "Laser.hpp"
+#include "Pill.hpp"
 
 class Character : public Util::GameObject {
 public:
@@ -32,10 +35,24 @@ public:
 
     void SetPosition(const glm::vec2& Position) { m_Transform.translation = Position; }
 
-    // TODO: Implement the collision detection
-    bool CollideWithBall(const std::shared_ptr<Ball>& ball) const;
-
     void HandleCollisionWithBall(const std::shared_ptr<Ball>& ball);
+
+    Pill::PILL_TYPE GetCurrentPill() const { return m_PillType; }
+
+    void SetCurrentPill(Pill::PILL_TYPE pillType) { m_PillType = pillType; }
+
+    void HandleCollisionWithPill(const std::shared_ptr<Pill>& pill);
+
+    void FireLaser(double currentTime, Util::Renderer& m_Root);
+
+    std::vector<std::shared_ptr<Laser>> GetLasers() { return m_Lasers; }
+
+    AABB GetAABB() const {
+        float halfWidth = GetScaledSize().x / 2.0f;
+        float halfHeight = GetScaledSize().y / 2.0f;
+        return AABB(GetPosition().x - halfWidth, GetPosition().x + halfWidth,
+                    GetPosition().y + halfHeight, GetPosition().y - halfHeight);
+    }
 
     // TODO: Add and implement more methods and properties as needed to finish Giraffe Adventure.
 
@@ -43,6 +60,9 @@ private:
     void ResetPosition() { m_Transform.translation = {0, 0}; }
 
     std::string m_ImagePath;
+    Pill::PILL_TYPE m_PillType = Pill::PILL_TYPE::NULL_Pill;
+    std::vector<std::shared_ptr<Laser>> m_Lasers;
+    double lastFireTime = 0;
 };
 
 

@@ -3,14 +3,16 @@
 //
 
 #include "Character.hpp"
-#include <ostream>
+#include <iostream>
 #include "Util/Image.hpp"
+#include "Util/Renderer.hpp"
 
 
 Character::Character(const std::string& ImagePath) {
     SetImage(ImagePath);
 
     ResetPosition();
+    lastFireTime = 0.0f;
 }
 
 void Character::SetImage(const std::string& ImagePath) {
@@ -18,31 +20,8 @@ void Character::SetImage(const std::string& ImagePath) {
     m_Drawable = std::make_shared<Util::Image>(m_ImagePath);
 }
 
-bool Character::CollideWithBall(const std::shared_ptr<Ball>& ball) const{
-    // Get Vaus (Paddle) Bounding Box
-    float vausLeft   = GetPosition().x - GetScaledSize().x / 2;
-    float vausRight  = GetPosition().x + GetScaledSize().x / 2;
-    float vausTop    = GetPosition().y + GetScaledSize().y / 2;
-    float vausBottom = GetPosition().y - GetScaledSize().y / 2;
-
-    // Get Ball Bounding Box
-    float ballLeft   = ball->GetPosition().x - ball->GetScaledSize().x / 2;
-    float ballRight  = ball->GetPosition().x + ball->GetScaledSize().x / 2;
-    float ballTop    = ball->GetPosition().y + ball->GetScaledSize().y / 2;
-    float ballBottom = ball->GetPosition().y - ball->GetScaledSize().y / 2;
-
-    // AABB Collision Check
-    bool isColliding = (vausRight >= ballLeft && vausLeft <= ballRight &&
-                        vausTop >= ballBottom && vausBottom <= ballTop);
-
-    return isColliding;
-
-}
-
 // Constants
 const float MAX_BOUNCE_ANGLE = M_PI / 1.5; // 60 degrees
-
-
 void Character::HandleCollisionWithBall(const std::shared_ptr<Ball>& ball) {
     ball->SetVelocity(glm::vec2{ball->GetVelocity().x, -ball->GetVelocity().y});
     // Calculate the relative position of the ball's impact on the paddle
@@ -59,16 +38,14 @@ void Character::HandleCollisionWithBall(const std::shared_ptr<Ball>& ball) {
     if (bounceAngle > 0 && bounceAngle < 0.4){
         bounceAngle = 0.4;
     }
-
+    bounceAngle = std::max(-1.0f, std::min(1.0f, bounceAngle));
     // Increase speed a little
     float current_speed = glm::length(ball->GetVelocity());
-    float new_speed =  1.1 * current_speed;
+    float new_speed =  1.05 * current_speed;
     if (new_speed > ball->GetMaxSpeed()){
         new_speed = ball->GetMaxSpeed();
     }
     glm::vec2 newVelocity;
-
-
     // Calculate the new velocity components
     newVelocity.x = new_speed * std::sin(bounceAngle);
     newVelocity.y = new_speed * std::cos(bounceAngle);
@@ -76,3 +53,45 @@ void Character::HandleCollisionWithBall(const std::shared_ptr<Ball>& ball) {
     // Set the new velocity
     ball->SetVelocity(newVelocity);
 }
+
+void Character::HandleCollisionWithPill(const std::shared_ptr<Pill>& pill){
+    Pill::PILL_TYPE pilltype = pill->GetType();
+    switch (pilltype){
+        case Pill::PILL_TYPE::BLUE:
+            m_PillType = Pill::PILL_TYPE::BLUE;
+            break;
+        case Pill::PILL_TYPE::GREEN:
+            m_PillType = Pill::PILL_TYPE::GREEN;
+            break;
+        case Pill::PILL_TYPE::RED:
+            m_PillType = Pill::PILL_TYPE::RED;
+            break;
+        case Pill::PILL_TYPE::GREY:
+            m_PillType = Pill::PILL_TYPE::GREY;
+            break;
+        case Pill::PILL_TYPE::PINK:
+            m_PillType = Pill::PILL_TYPE::PINK;
+            break;
+        case Pill::PILL_TYPE::ORANGE:
+            m_PillType = Pill::PILL_TYPE::ORANGE;
+            break;
+        case Pill::PILL_TYPE::LIGHTBLUE:
+            m_PillType = Pill::PILL_TYPE::LIGHTBLUE;
+            break;
+        default:
+            m_PillType = Pill::PILL_TYPE::NULL_Pill;
+            break;
+    }
+}
+
+void Character::FireLaser(double currentTime, Util::Renderer& m_Root){
+    if (currentTime - lastFireTime >= 100){
+        std::shared_ptr<Laser> laser1 = std::make_shared<Laser>(RESOURCE_DIR"/Image/Laser/Laser.png", glm::vec2{GetPosition().x, GetPosition().y}, 10);
+        laser1->SetVisible(true);
+        laser1->SetZIndex(50);
+        m_Lasers.push_back(laser1);
+        lastFireTime = currentTime;
+        m_Root.AddChild(laser1);
+    }
+}
+
