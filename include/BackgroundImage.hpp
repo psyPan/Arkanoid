@@ -9,19 +9,20 @@
 #include <iostream>
 class BackgroundImage : public Util::GameObject{
 public:
-    BackgroundImage() : GameObject(std::make_unique<Util::Image>(RESOURCE_DIR"/Image/Background/Level1.png"), -10) {
+    BackgroundImage(int level) : GameObject(std::make_unique<Util::Image>(RESOURCE_DIR"/Image/Background/Level1.png"), -10), m_level(level) {
 
     }
-    void NextLevel(const int level) {
+    void SetBackGroundImage() {
         auto temp = std::dynamic_pointer_cast<Util::Image>(m_Drawable);
-        temp->SetImage(ImagePath(level));
+        temp->SetImage(RESOURCE_DIR"/Image/Background/level" + std::to_string(m_level) + ".png");
     }
 
 
 private:
-    inline std::string ImagePath(const int level) {
-        return RESOURCE_DIR"/Image/Background/level" + std::to_string(level) + ".png";
-    }
+    // inline std::string ImagePath(const int level) {
+    //     return RESOURCE_DIR"/Image/Background/level" + std::to_string(level) + ".png";
+    // }
+    int m_level;
 };
 
 

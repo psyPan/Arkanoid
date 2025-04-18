@@ -10,7 +10,7 @@
 class Ball : public Entity{
 private:
     bool m_isSticky;
-    glm::vec2 m_velocity = glm::vec2{0};
+    glm::vec2 m_velocity = glm::vec2{0,0};
     float m_maxSpeed;
 
 public:

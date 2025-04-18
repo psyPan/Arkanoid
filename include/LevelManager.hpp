@@ -18,9 +18,8 @@ private:
     std::vector<std::vector<Brick::BRICK_TYPE>> m_layout;
 
 public:
-    LevelManager();
+    LevelManager(int level);
     // ~LevelManager();
-    void NextLevel();
 
     [[nodiscard]] std::shared_ptr<Util::GameObject> GetChild() const {
         return m_backgroundImage;
@@ -34,6 +33,7 @@ public:
         return m_level;
     }
     static std::vector<std::vector<Brick::BRICK_TYPE>> Level1_layout;
+    static std::vector<std::vector<Brick::BRICK_TYPE>> Level2_layout;
     void CreateBrick(Util::Renderer& m_Root);
 
     std::vector<std::shared_ptr<Brick>>& GetBricks(){

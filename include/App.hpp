@@ -36,6 +36,10 @@ public:
 
     void OtherPowerUp();
 
+    void DeleteInactiveLasers();
+
+    void CheckForCollision();
+
 private:
     void ValidTask();
 
@@ -60,6 +64,8 @@ private:
     bool shouldReplaceVaus = false; // For Blue and Red powerup
     bool otherPowerUp = false; // Except blue and red powerup
     Pill::PILL_TYPE pendingPillType;
+    std::vector<std::shared_ptr<Brick>> bricksToRemove;
+    int m_level;
 };
 
 #endif

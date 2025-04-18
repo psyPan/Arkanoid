@@ -25,8 +25,9 @@ void LogBrickType(Brick::BRICK_TYPE brickType) {
 
 void App::Start() {
     LOG_TRACE("Start");
+    m_level = 1;
     m_CurrentState = State::UPDATE;
-    m_LevelManager = std::make_shared<LevelManager>();
+    m_LevelManager = std::make_shared<LevelManager>(m_level);
     m_Root.AddChild(m_LevelManager->GetChild());
 
     // Vaus
@@ -37,7 +38,10 @@ void App::Start() {
     m_Root.AddChild(m_Vaus);
 
     // Ball
-    m_Ball = std::make_shared<Ball>(RESOURCE_DIR"/Image/Ball/ball.png", true, glm::vec2{80,60});
+    m_Ball = std::make_shared<Ball>(RESOURCE_DIR"/Image/Ball/ball.png", true, glm::vec2{60,60});
+    std::cout << "In App Start" << std::endl;
+    std::cout << "Ball speed: x = " << m_Ball->GetVelocity().x << std::endl;
+    std::cout << "Ball speed: y = " << m_Ball->GetVelocity().y << std::endl;
     m_Ball->SetZIndex(50);
     m_Ball->SetPosition({m_Vaus->GetPosition().x, m_Vaus->GetPosition().y + m_Vaus->GetScaledSize().y/2 + m_Ball->GetScaledSize().y/2});
     m_Ball->SetVisible(true);
@@ -52,6 +56,15 @@ void App::Update() {
     m_Root.Update();
     
     //TODO: do your things here and delete this line <3
+
+    if (m_LevelManager->GetBricks().empty()){
+        m_Root.RemoveChild(m_LevelManager->GetChild());
+        m_LevelManager->GetChild().reset();
+        m_LevelManager.reset();
+        m_LevelManager = std::make_shared<LevelManager>(++m_level);
+        m_Root.AddChild(m_LevelManager->GetChild()); // add new background
+        m_LevelManager->CreateBrick(m_Root);
+    }
 
     // Movement of Vaus
     if (Util::Input::IsKeyPressed(Util::Keycode::A)){
@@ -71,17 +84,23 @@ void App::Update() {
     }
 
     // m_ball is sticky or not
+    glm::vec2 startingVelocity = m_Ball->GetVelocity();
     if (m_Ball->IsSticky()){
         m_Ball->SetPosition({m_Vaus->GetPosition().x + 5, m_Vaus->GetPosition().y + m_Vaus->GetScaledSize().y/2 + m_Ball->GetScaledSize().y/2});
+        m_Ball->SetVelocity(startingVelocity);
 
         if (Util::Input::IsKeyPressed(Util::Keycode::SPACE)){
             m_Ball->SetIsSticky(false);
-
+            std::cout << "IN sticky" << std::endl;
+            std::cout << "Ball speed: x = " << m_Ball->GetVelocity().x << std::endl;
+            std::cout << "Ball speed: y = " << m_Ball->GetVelocity().y << std::endl;
         }
     }
 
     if (!m_Ball->IsSticky()){
         m_Ball->SetPosition({m_Ball->GetPosition().x + (m_Ball->GetVelocity().x * m_Time.GetDeltaTime()), m_Ball->GetPosition().y + (m_Ball->GetVelocity().y * m_Time.GetDeltaTime())});
+        std::cout << "Ball speed: x = " << m_Ball->GetVelocity().x << std::endl;
+        std::cout << "Ball speed: y = " << m_Ball->GetVelocity().y << std::endl;
         // "speed * GetDeltaTime" to have uniform speed on PCs with different FPS.
     }
 
@@ -144,7 +163,7 @@ void App::Update() {
         otherPowerUp = false;
     }
 
-    // Laser shooting Vaus
+    // Laser shooting Vaus.
     if (m_Vaus->GetImagePath() == RESOURCE_DIR"/Image/Vaus/Shoot0.png"){
         // Vaus shooting laser
         if (Util::Input::IsKeyPressed(Util::Keycode::SPACE)){
@@ -152,36 +171,17 @@ void App::Update() {
         }
     }
 
+    // Update the lasers' positions.
     for (auto& laser: m_Vaus->GetLasers()){
-        laser->Update();
-        // m_Root.AddChild(laser);
+        laser->Update(m_LevelManager->GetBackgroundImage()->GetScaledSize());
     }
 
-    // Find the primary brick that the ball has collided with
-    std::shared_ptr<Brick> collidedBrick = m_LevelManager->PrimaryCollidedBrick(m_Ball);
+    // Delete the out of bound lasers.
+    DeleteInactiveLasers();
 
-    if (collidedBrick) { // If there is a valid collided brick
-        collidedBrick->HandleCollisionWithBall(m_Ball);
-        collidedBrick->OnHit();
-        if (!isSpawningPill && collidedBrick->GetBrickType()!= Brick::BRICK_TYPE::SILVER){
-            Pill::PILL_TYPE spawningPill = collidedBrick->SpawnPill();
-            CreatePill(spawningPill, collidedBrick->GetPosition());
-        }
+    CheckForCollision();
 
-        if (collidedBrick->IsDestroyed()) {
-            collidedBrick->SetVisible(false);
 
-            // Remove the brick from the scene and level
-            m_Root.RemoveChild(std::dynamic_pointer_cast<Util::GameObject>(collidedBrick));
-
-            // Find and erase the brick from the list
-            auto& bricks = m_LevelManager->GetBricks();
-            auto it = std::find(bricks.begin(), bricks.end(), collidedBrick); // it will be the primary collided brick.
-            if (it != bricks.end()) {
-                bricks.erase(it);
-            }
-        }
-    }
 
     if (Util::Input::IsKeyUp(Util::Keycode::ESCAPE) ||
         Util::Input::IfExit()) {
@@ -193,26 +193,36 @@ void App::CreatePill(const Pill::PILL_TYPE& pill, const glm::vec2& pos){
     switch (pill){
         case Pill::PILL_TYPE::BLUE:
             m_Pill = std::make_shared<Pill>(RESOURCE_DIR"/Image/Pill/BluePill0.png",Pill::PILL_TYPE::BLUE, pos);
+            m_Pill->SetVisible(true);
+            m_Pill->SetZIndex(50);
             isSpawningPill = true;
             m_Root.AddChild(m_Pill);
             break;
         case Pill::PILL_TYPE::GREEN:
             m_Pill = std::make_shared<Pill>(RESOURCE_DIR"/Image/Pill/GreenPill0.png",Pill::PILL_TYPE::GREEN, pos);
+        m_Pill->SetVisible(true);
+        m_Pill->SetZIndex(50);
             isSpawningPill = true;
             m_Root.AddChild(m_Pill);
             break;
         case Pill::PILL_TYPE::RED:
             m_Pill = std::make_shared<Pill>(RESOURCE_DIR"/Image/Pill/RedPill0.png",Pill::PILL_TYPE::RED, pos);
+        m_Pill->SetVisible(true);
+        m_Pill->SetZIndex(50);
             isSpawningPill = true;
             m_Root.AddChild(m_Pill);
             break;
         case Pill::PILL_TYPE::GREY:
             m_Pill = std::make_shared<Pill>(RESOURCE_DIR"/Image/Pill/GreyPill0.png",Pill::PILL_TYPE::GREY, pos);
+        m_Pill->SetVisible(true);
+        m_Pill->SetZIndex(50);
             isSpawningPill = true;
             m_Root.AddChild(m_Pill);
             break;
         case Pill::PILL_TYPE::PINK:
             m_Pill = std::make_shared<Pill>(RESOURCE_DIR"/Image/Pill/PinkPill0.png",Pill::PILL_TYPE::PINK, pos);
+        m_Pill->SetVisible(true);
+        m_Pill->SetZIndex(50);
             isSpawningPill = true;
             m_Root.AddChild(m_Pill);
             break;
@@ -223,6 +233,8 @@ void App::CreatePill(const Pill::PILL_TYPE& pill, const glm::vec2& pos){
             break;
         case Pill::PILL_TYPE::ORANGE:
             m_Pill = std::make_shared<Pill>(RESOURCE_DIR"/Image/Pill/OrangePill0.png",Pill::PILL_TYPE::ORANGE, pos);
+        m_Pill->SetVisible(true);
+        m_Pill->SetZIndex(50);
             isSpawningPill = true;
             m_Root.AddChild(m_Pill);
             break;
@@ -235,13 +247,13 @@ void App::VausPowerUp(){
     m_Vaus.reset();
     switch (pendingPillType){
         case Pill::PILL_TYPE::BLUE:
-            m_Root.RemoveChild(m_Vaus);
-            m_Vaus.reset();
+            // m_Root.RemoveChild(m_Vaus);
+            // m_Vaus.reset();
             m_Vaus = std::make_shared<Character>(RESOURCE_DIR"/Image/Vaus/Long0.png");
             break;
         case Pill::PILL_TYPE::RED:
-            m_Root.RemoveChild(m_Vaus);
-            m_Vaus.reset();
+            // m_Root.RemoveChild(m_Vaus);
+            // m_Vaus.reset();
             m_Vaus = std::make_shared<Character>(RESOURCE_DIR"/Image/Vaus/Shoot0.png");
             break;
     }
@@ -268,6 +280,76 @@ void App::OtherPowerUp(){
         case Pill::PILL_TYPE::ORANGE:
             std::cout << "ORANGE" << std::endl;
             break;
+    }
+}
+
+void App::DeleteInactiveLasers(){
+    auto& lasers = m_Vaus->GetLasers();
+    for (auto it = lasers.begin(); it != lasers.end();){
+        if (!(*it)->IsActive()){
+            (*it)->SetVisible(false);
+            m_Root.RemoveChild(*it);
+            it = lasers.erase(it);
+        }
+        else{
+            ++it;
+        }
+    }
+}
+
+void App::CheckForCollision(){
+    // Find the primary brick that the ball has collided with
+    std::shared_ptr<Brick> collidedBrick = m_LevelManager->PrimaryCollidedBrick(m_Ball);
+    if (collidedBrick) { // If there is a valid collided brick
+        collidedBrick->HandleCollisionWithBall(m_Ball);
+        collidedBrick->OnHit();
+        if (!isSpawningPill && collidedBrick->GetBrickType()!= Brick::BRICK_TYPE::SILVER){
+            Pill::PILL_TYPE spawningPill = collidedBrick->SpawnPill();
+            CreatePill(spawningPill, collidedBrick->GetPosition());
+        }
+        if (collidedBrick->IsDestroyed()) {
+            collidedBrick->SetVisible(false);
+
+            // Remove the brick from the scene and level
+            m_Root.RemoveChild(std::dynamic_pointer_cast<Util::GameObject>(collidedBrick));
+
+            // Find and erase the brick from the list
+            auto& bricks = m_LevelManager->GetBricks();
+            auto it = std::find(bricks.begin(), bricks.end(), collidedBrick); // it will be the primary collided brick.
+            if (it != bricks.end()) {
+                bricks.erase(it);
+            }
+        }
+    }
+
+    // Checking collision between Brick and Lasers.
+    for (auto& laser: m_Vaus->GetLasers()){
+        for (auto& brick : m_LevelManager->GetBricks()) {
+            if (laser->GetAABB().Intersects(brick->GetAABB())) {
+                brick->OnHit(); // damage logic
+                if (!isSpawningPill && brick->GetBrickType()!= Brick::BRICK_TYPE::SILVER){
+                    Pill::PILL_TYPE spawningPill = brick->SpawnPill();
+                    CreatePill(spawningPill, brick->GetPosition());
+                }
+
+                if (brick->IsDestroyed()) {
+                    brick->SetVisible(false);
+                    bricksToRemove.push_back(brick);
+                    m_Root.RemoveChild(std::dynamic_pointer_cast<Util::GameObject>(brick));
+                }
+
+                laser->SetActive(false); // deactivate laser
+                break; // one laser hits only one brick
+            }
+        }
+    }
+    // Remove destroyed bricks from LevelManager list
+    auto& bricks = m_LevelManager->GetBricks();
+    for (auto& brick : bricksToRemove) {
+        auto it = std::find(bricks.begin(), bricks.end(), brick);
+        if (it != bricks.end()) {
+            bricks.erase(it);
+        }
     }
 }
 

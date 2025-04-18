@@ -45,7 +45,7 @@ public:
 
     void FireLaser(double currentTime, Util::Renderer& m_Root);
 
-    std::vector<std::shared_ptr<Laser>> GetLasers() { return m_Lasers; }
+    std::vector<std::shared_ptr<Laser>>& GetLasers() { return m_Lasers; }
 
     AABB GetAABB() const {
         float halfWidth = GetScaledSize().x / 2.0f;

@@ -85,13 +85,18 @@ void Character::HandleCollisionWithPill(const std::shared_ptr<Pill>& pill){
 }
 
 void Character::FireLaser(double currentTime, Util::Renderer& m_Root){
-    if (currentTime - lastFireTime >= 100){
-        std::shared_ptr<Laser> laser1 = std::make_shared<Laser>(RESOURCE_DIR"/Image/Laser/Laser.png", glm::vec2{GetPosition().x, GetPosition().y}, 10);
+    if (currentTime - lastFireTime >= 150){
+        std::shared_ptr<Laser> laser1 = std::make_shared<Laser>(RESOURCE_DIR"/Image/Laser/Laser.png", glm::vec2{GetPosition().x - GetScaledSize().x/4, GetPosition().y + GetScaledSize().y/2}, 10);
+        std::shared_ptr<Laser> laser2 = std::make_shared<Laser>(RESOURCE_DIR"/Image/Laser/Laser.png", glm::vec2{GetPosition().x + GetScaledSize().x/4, GetPosition().y + GetScaledSize().y/2}, 10);
         laser1->SetVisible(true);
         laser1->SetZIndex(50);
+        laser2->SetVisible(true);
+        laser2->SetZIndex(50);
         m_Lasers.push_back(laser1);
+        m_Lasers.push_back(laser2);
         lastFireTime = currentTime;
         m_Root.AddChild(laser1);
+        m_Root.AddChild(laser2);
     }
 }
 

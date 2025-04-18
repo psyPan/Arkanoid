@@ -12,23 +12,36 @@ std::vector<std::vector<Brick::BRICK_TYPE>> LevelManager::Level1_layout =
     {Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::GREEN}
     };
 
+std::vector<std::vector<Brick::BRICK_TYPE>> LevelManager::Level2_layout =
+    {{Brick::BRICK_TYPE::WHITE,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK},
+    {Brick::BRICK_TYPE::WHITE,Brick::BRICK_TYPE::ORANGE,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK},
+    {Brick::BRICK_TYPE::WHITE,Brick::BRICK_TYPE::ORANGE,Brick::BRICK_TYPE::LIGHT_BLUE,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK},
+    {Brick::BRICK_TYPE::WHITE,Brick::BRICK_TYPE::ORANGE,Brick::BRICK_TYPE::LIGHT_BLUE,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK},
+    {Brick::BRICK_TYPE::WHITE,Brick::BRICK_TYPE::ORANGE,Brick::BRICK_TYPE::LIGHT_BLUE,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::RED,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK},
+    {Brick::BRICK_TYPE::WHITE,Brick::BRICK_TYPE::ORANGE,Brick::BRICK_TYPE::LIGHT_BLUE,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::RED,Brick::BRICK_TYPE::BLUE,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK},
+    {Brick::BRICK_TYPE::WHITE,Brick::BRICK_TYPE::ORANGE,Brick::BRICK_TYPE::LIGHT_BLUE,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::RED,Brick::BRICK_TYPE::BLUE,Brick::BRICK_TYPE::PINK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK},
+    {Brick::BRICK_TYPE::WHITE,Brick::BRICK_TYPE::ORANGE,Brick::BRICK_TYPE::LIGHT_BLUE,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::RED,Brick::BRICK_TYPE::BLUE,Brick::BRICK_TYPE::PINK,Brick::BRICK_TYPE::YELLOW,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK},
+    {Brick::BRICK_TYPE::WHITE,Brick::BRICK_TYPE::ORANGE,Brick::BRICK_TYPE::LIGHT_BLUE,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::RED,Brick::BRICK_TYPE::BLUE,Brick::BRICK_TYPE::PINK,Brick::BRICK_TYPE::YELLOW,Brick::BRICK_TYPE::WHITE,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK},
+    {Brick::BRICK_TYPE::WHITE,Brick::BRICK_TYPE::ORANGE,Brick::BRICK_TYPE::LIGHT_BLUE,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::RED,Brick::BRICK_TYPE::BLUE,Brick::BRICK_TYPE::PINK,Brick::BRICK_TYPE::YELLOW,Brick::BRICK_TYPE::WHITE,Brick::BRICK_TYPE::ORANGE},
+    {Brick::BRICK_TYPE::WHITE,Brick::BRICK_TYPE::ORANGE,Brick::BRICK_TYPE::LIGHT_BLUE,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::RED,Brick::BRICK_TYPE::BLUE,Brick::BRICK_TYPE::PINK,Brick::BRICK_TYPE::YELLOW,Brick::BRICK_TYPE::WHITE,Brick::BRICK_TYPE::ORANGE,Brick::BRICK_TYPE::LIGHT_BLUE},
+    {Brick::BRICK_TYPE::WHITE,Brick::BRICK_TYPE::ORANGE,Brick::BRICK_TYPE::LIGHT_BLUE,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::RED,Brick::BRICK_TYPE::BLUE,Brick::BRICK_TYPE::PINK,Brick::BRICK_TYPE::YELLOW,Brick::BRICK_TYPE::WHITE,Brick::BRICK_TYPE::ORANGE,Brick::BRICK_TYPE::LIGHT_BLUE,Brick::BRICK_TYPE::GREEN},
+    {Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::RED}
+    };
+
 void SetupBricks(const std::string& path, Brick::BRICK_TYPE brickType, std::vector<std::shared_ptr<Brick>>& m_bricks, Util::Renderer& m_Root,const glm::vec2& start_pos, int i, int j, int hitCount, float spawnProbability = 0.2){
     std::shared_ptr<Brick> brick = std::make_shared<Brick>(path, brickType);
     glm::vec2 update_pos = glm::vec2{start_pos.x + j * brick->GetScaledSize().x, start_pos.y - i * brick->GetScaledSize().y};
     brick->SetHitCount(hitCount);
     brick->SetPosition(update_pos);
+    brick->SetZIndex(50);
     m_bricks.push_back(brick);
     m_Root.AddChild(brick);
 }
 
-LevelManager::LevelManager() : m_level(1){
-    m_backgroundImage = std::make_shared<BackgroundImage>();
+LevelManager::LevelManager(int level) : m_level(level){
+    m_backgroundImage = std::make_shared<BackgroundImage>(m_level);
+    m_backgroundImage->SetBackGroundImage();
     SetLevelLayout();
-}
-
-void LevelManager::NextLevel() {
-    m_backgroundImage->NextLevel(m_level);
-
 }
 
 void LevelManager::SetLevelLayout(){
@@ -37,6 +50,8 @@ void LevelManager::SetLevelLayout(){
             m_layout = Level1_layout;
             break;
         case 2:
+            m_layout = Level2_layout;
+            break;
         default:
             m_layout = Level1_layout;
     }
@@ -92,6 +107,18 @@ void LevelManager::CreateBrick(Util::Renderer& m_Root){
             else if (m_layout[i][j] == Brick::BRICK_TYPE::GREEN){
                 std::string imagePath = RESOURCE_DIR"/Image/Brick/Green.png";
                 SetupBricks(imagePath,Brick::BRICK_TYPE::GREEN, m_bricks, m_Root, start_pos, i, j, 1);
+            }
+            else if (m_layout[i][j] == Brick::BRICK_TYPE::WHITE){
+                std::string imagePath = RESOURCE_DIR"/Image/Brick/White.png";
+                SetupBricks(imagePath, Brick::BRICK_TYPE::WHITE, m_bricks, m_Root, start_pos, i, j, 1);
+            }
+            else if (m_layout[i][j] == Brick::BRICK_TYPE::LIGHT_BLUE){
+                std::string imagePath = RESOURCE_DIR"/Image/Brick/LightBlue.png";
+                SetupBricks(imagePath, Brick::BRICK_TYPE::LIGHT_BLUE, m_bricks, m_Root, start_pos, i, j, 1);
+            }
+            else if (m_layout[i][j] == Brick::BRICK_TYPE::ORANGE){
+                std::string imagePath = RESOURCE_DIR"/Image/Brick/Orange.png";
+                SetupBricks(imagePath, Brick::BRICK_TYPE::ORANGE, m_bricks, m_Root, start_pos, i, j, 1);
             }
         }
     }
