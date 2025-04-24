@@ -13,6 +13,7 @@ Character::Character(const std::string& ImagePath) {
 
     ResetPosition();
     lastFireTime = 0.0f;
+    m_StartingState = true;
 }
 
 void Character::SetImage(const std::string& ImagePath) {
@@ -23,35 +24,38 @@ void Character::SetImage(const std::string& ImagePath) {
 // Constants
 const float MAX_BOUNCE_ANGLE = M_PI / 1.5; // 60 degrees
 void Character::HandleCollisionWithBall(const std::shared_ptr<Ball>& ball) {
-    ball->SetVelocity(glm::vec2{ball->GetVelocity().x, -ball->GetVelocity().y});
-    // Calculate the relative position of the ball's impact on the paddle
-    float relativeIntersectX = (ball->GetPosition().x - GetPosition().x) / GetScaledSize().x;
-    // Clamp the value to the range [-1, 1]
-    relativeIntersectX = std::max(-1.0f, std::min(1.0f, relativeIntersectX));
-    // Calculate the bounce angle
-    float bounceAngle = relativeIntersectX * MAX_BOUNCE_ANGLE;
+    if (!m_StartingState){
+        ball->SetVelocity(glm::vec2{ball->GetVelocity().x, -ball->GetVelocity().y});
+        // Calculate the relative position of the ball's impact on the paddle
+        float relativeIntersectX = (ball->GetPosition().x - GetPosition().x) / GetScaledSize().x;
+        // Clamp the value to the range [-1, 1]
+        relativeIntersectX = std::max(-1.0f, std::min(1.0f, relativeIntersectX));
+        // Calculate the bounce angle
+        float bounceAngle = relativeIntersectX * MAX_BOUNCE_ANGLE;
 
-    // Adjust angle
-    if (bounceAngle < 0 && bounceAngle > -0.4){
-        bounceAngle = -0.4;
-    }
-    if (bounceAngle > 0 && bounceAngle < 0.4){
-        bounceAngle = 0.4;
-    }
-    bounceAngle = std::max(-1.0f, std::min(1.0f, bounceAngle));
-    // Increase speed a little
-    float current_speed = glm::length(ball->GetVelocity());
-    float new_speed =  1.05 * current_speed;
-    if (new_speed > ball->GetMaxSpeed()){
-        new_speed = ball->GetMaxSpeed();
-    }
-    glm::vec2 newVelocity;
-    // Calculate the new velocity components
-    newVelocity.x = new_speed * std::sin(bounceAngle);
-    newVelocity.y = new_speed * std::cos(bounceAngle);
+        // Adjust angle
+        if (bounceAngle < 0 && bounceAngle > -0.4){
+            bounceAngle = -0.4;
+        }
+        if (bounceAngle > 0 && bounceAngle < 0.4){
+            bounceAngle = 0.4;
+        }
+        bounceAngle = std::max(-1.0f, std::min(1.0f, bounceAngle));
+        // Increase speed a little
+        float current_speed = glm::length(ball->GetVelocity());
+        float new_speed =  1.02 * current_speed;
+        if (new_speed > ball->GetMaxSpeed()){
+            new_speed = ball->GetMaxSpeed();
+        }
+        glm::vec2 newVelocity;
+        // Calculate the new velocity components
+        newVelocity.x = new_speed * std::sin(bounceAngle);
+        newVelocity.y = new_speed * std::cos(bounceAngle);
 
-    // Set the new velocity
-    ball->SetVelocity(newVelocity);
+        // Set the new velocity
+        ball->SetVelocity(newVelocity);
+    }
+
 }
 
 void Character::HandleCollisionWithPill(const std::shared_ptr<Pill>& pill){

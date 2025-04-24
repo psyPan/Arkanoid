@@ -5,6 +5,8 @@
 #include "Util/Keycode.hpp"
 #include "Util/Logger.hpp"
 #include "Brick.hpp"
+#include "GameText.hpp"
+
 void LogBrickType(Brick::BRICK_TYPE brickType) {
     switch (brickType) {
         case Brick::BRICK_TYPE::NULL_BRICK: std::cout << "Brick Type: NULL_BRICK: "; break;
@@ -22,9 +24,9 @@ void LogBrickType(Brick::BRICK_TYPE brickType) {
     }
 }
 
-
 void App::Start() {
     LOG_TRACE("Start");
+    m_lives = 2;
     m_level = 1;
     m_CurrentState = State::UPDATE;
     m_LevelManager = std::make_shared<LevelManager>(m_level);
@@ -37,11 +39,21 @@ void App::Start() {
     m_Vaus->SetVisible(true);
     m_Root.AddChild(m_Vaus);
 
+    // Player lives icon
+    m_Icon = std::make_shared<Entity>(RESOURCE_DIR"/Image/Vaus/small.png");
+    glm::vec2 icon_pos = glm::vec2{-(m_LevelManager->GetBackgroundImage()->GetScaledSize().x/2) + m_Icon->GetScaledSize().x, -(m_LevelManager->GetBackgroundImage()->GetScaledSize().y/2) + m_Icon->GetScaledSize().y};
+    m_Icon->SetPosition(icon_pos);
+    m_Icon->SetVisible(true);
+    m_Icon->SetZIndex(50);
+    m_Root.AddChild(m_Icon);
+    glm::vec2 text_pos = glm::vec2{icon_pos.x + m_Icon->GetScaledSize().x, icon_pos.y};
+    m_num_of_lives_Text = std::make_shared<GameText>(" x " + std::to_string(m_lives), text_pos, 15);
+    m_num_of_lives_Text->SetVisible(true);
+    m_num_of_lives_Text->SetZIndex(50);
+    m_Root.AddChild(m_num_of_lives_Text);
+
     // Ball
-    m_Ball = std::make_shared<Ball>(RESOURCE_DIR"/Image/Ball/ball.png", true, glm::vec2{60,60});
-    std::cout << "In App Start" << std::endl;
-    std::cout << "Ball speed: x = " << m_Ball->GetVelocity().x << std::endl;
-    std::cout << "Ball speed: y = " << m_Ball->GetVelocity().y << std::endl;
+    m_Ball = std::make_shared<Ball>(RESOURCE_DIR"/Image/Ball/ball.png", true, glm::vec2{100,180});
     m_Ball->SetZIndex(50);
     m_Ball->SetPosition({m_Vaus->GetPosition().x, m_Vaus->GetPosition().y + m_Vaus->GetScaledSize().y/2 + m_Ball->GetScaledSize().y/2});
     m_Ball->SetVisible(true);
@@ -57,13 +69,10 @@ void App::Update() {
     
     //TODO: do your things here and delete this line <3
 
+    UpdateLivesUI();
+
     if (m_LevelManager->GetBricks().empty()){
-        m_Root.RemoveChild(m_LevelManager->GetChild());
-        m_LevelManager->GetChild().reset();
-        m_LevelManager.reset();
-        m_LevelManager = std::make_shared<LevelManager>(++m_level);
-        m_Root.AddChild(m_LevelManager->GetChild()); // add new background
-        m_LevelManager->CreateBrick(m_Root);
+        RestartLevel();
     }
 
     // Movement of Vaus
@@ -84,23 +93,18 @@ void App::Update() {
     }
 
     // m_ball is sticky or not
-    glm::vec2 startingVelocity = m_Ball->GetVelocity();
+    // glm::vec2 startingVelocity = m_Ball->GetVelocity();
     if (m_Ball->IsSticky()){
         m_Ball->SetPosition({m_Vaus->GetPosition().x + 5, m_Vaus->GetPosition().y + m_Vaus->GetScaledSize().y/2 + m_Ball->GetScaledSize().y/2});
-        m_Ball->SetVelocity(startingVelocity);
-
         if (Util::Input::IsKeyPressed(Util::Keycode::SPACE)){
             m_Ball->SetIsSticky(false);
-            std::cout << "IN sticky" << std::endl;
-            std::cout << "Ball speed: x = " << m_Ball->GetVelocity().x << std::endl;
-            std::cout << "Ball speed: y = " << m_Ball->GetVelocity().y << std::endl;
+            m_Vaus->SetStartingState(false);
         }
     }
 
     if (!m_Ball->IsSticky()){
+        m_Vaus->SetStartingState(false);
         m_Ball->SetPosition({m_Ball->GetPosition().x + (m_Ball->GetVelocity().x * m_Time.GetDeltaTime()), m_Ball->GetPosition().y + (m_Ball->GetVelocity().y * m_Time.GetDeltaTime())});
-        std::cout << "Ball speed: x = " << m_Ball->GetVelocity().x << std::endl;
-        std::cout << "Ball speed: y = " << m_Ball->GetVelocity().y << std::endl;
         // "speed * GetDeltaTime" to have uniform speed on PCs with different FPS.
     }
 
@@ -181,8 +185,6 @@ void App::Update() {
 
     CheckForCollision();
 
-
-
     if (Util::Input::IsKeyUp(Util::Keycode::ESCAPE) ||
         Util::Input::IfExit()) {
         m_CurrentState = State::END;
@@ -200,29 +202,29 @@ void App::CreatePill(const Pill::PILL_TYPE& pill, const glm::vec2& pos){
             break;
         case Pill::PILL_TYPE::GREEN:
             m_Pill = std::make_shared<Pill>(RESOURCE_DIR"/Image/Pill/GreenPill0.png",Pill::PILL_TYPE::GREEN, pos);
-        m_Pill->SetVisible(true);
-        m_Pill->SetZIndex(50);
+            m_Pill->SetVisible(true);
+            m_Pill->SetZIndex(50);
             isSpawningPill = true;
             m_Root.AddChild(m_Pill);
             break;
         case Pill::PILL_TYPE::RED:
             m_Pill = std::make_shared<Pill>(RESOURCE_DIR"/Image/Pill/RedPill0.png",Pill::PILL_TYPE::RED, pos);
-        m_Pill->SetVisible(true);
-        m_Pill->SetZIndex(50);
+            m_Pill->SetVisible(true);
+            m_Pill->SetZIndex(50);
             isSpawningPill = true;
             m_Root.AddChild(m_Pill);
             break;
         case Pill::PILL_TYPE::GREY:
             m_Pill = std::make_shared<Pill>(RESOURCE_DIR"/Image/Pill/GreyPill0.png",Pill::PILL_TYPE::GREY, pos);
-        m_Pill->SetVisible(true);
-        m_Pill->SetZIndex(50);
+            m_Pill->SetVisible(true);
+            m_Pill->SetZIndex(50);
             isSpawningPill = true;
             m_Root.AddChild(m_Pill);
             break;
         case Pill::PILL_TYPE::PINK:
             m_Pill = std::make_shared<Pill>(RESOURCE_DIR"/Image/Pill/PinkPill0.png",Pill::PILL_TYPE::PINK, pos);
-        m_Pill->SetVisible(true);
-        m_Pill->SetZIndex(50);
+            m_Pill->SetVisible(true);
+            m_Pill->SetZIndex(50);
             isSpawningPill = true;
             m_Root.AddChild(m_Pill);
             break;
@@ -233,8 +235,8 @@ void App::CreatePill(const Pill::PILL_TYPE& pill, const glm::vec2& pos){
             break;
         case Pill::PILL_TYPE::ORANGE:
             m_Pill = std::make_shared<Pill>(RESOURCE_DIR"/Image/Pill/OrangePill0.png",Pill::PILL_TYPE::ORANGE, pos);
-        m_Pill->SetVisible(true);
-        m_Pill->SetZIndex(50);
+            m_Pill->SetVisible(true);
+            m_Pill->SetZIndex(50);
             isSpawningPill = true;
             m_Root.AddChild(m_Pill);
             break;
@@ -243,17 +245,17 @@ void App::CreatePill(const Pill::PILL_TYPE& pill, const glm::vec2& pos){
 
 void App::VausPowerUp(){
     glm::vec2 currentPos = m_Vaus->GetPosition();
+    for (auto& laser: m_Vaus->GetLasers()){
+        m_Root.RemoveChild(laser);
+    }
+    m_Vaus->ClearLasers();
     m_Root.RemoveChild(m_Vaus);
     m_Vaus.reset();
     switch (pendingPillType){
         case Pill::PILL_TYPE::BLUE:
-            // m_Root.RemoveChild(m_Vaus);
-            // m_Vaus.reset();
             m_Vaus = std::make_shared<Character>(RESOURCE_DIR"/Image/Vaus/Long0.png");
             break;
         case Pill::PILL_TYPE::RED:
-            // m_Root.RemoveChild(m_Vaus);
-            // m_Vaus.reset();
             m_Vaus = std::make_shared<Character>(RESOURCE_DIR"/Image/Vaus/Shoot0.png");
             break;
     }
@@ -266,10 +268,10 @@ void App::VausPowerUp(){
 void App::OtherPowerUp(){
     switch (pendingPillType){
         case Pill::PILL_TYPE::GREEN:
-            std::cout << "GREEN" << std::endl;
+            // m_Ball->SetIsSticky(true);
             break;
         case Pill::PILL_TYPE::GREY:
-            std::cout << "GREY" << std::endl;
+            m_lives++;
             break;
         case Pill::PILL_TYPE::PINK:
             std::cout << "PINK" << std::endl;
@@ -278,7 +280,7 @@ void App::OtherPowerUp(){
             std::cout << "LIGHTBLUE" << std::endl;
             break;
         case Pill::PILL_TYPE::ORANGE:
-            std::cout << "ORANGE" << std::endl;
+            m_Ball->SlowDownSpeed();
             break;
     }
 }
@@ -350,6 +352,56 @@ void App::CheckForCollision(){
         if (it != bricks.end()) {
             bricks.erase(it);
         }
+    }
+}
+
+void App::RestartLevel(){
+    // Restarting m_LevelManager
+    m_Root.RemoveChild(m_LevelManager->GetChild());
+    m_LevelManager->GetChild().reset();
+    m_LevelManager.reset();
+    m_LevelManager = std::make_shared<LevelManager>(++m_level);
+    m_Root.AddChild(m_LevelManager->GetChild()); // add new background
+    m_LevelManager->CreateBrick(m_Root);
+
+    // Restarting m_Ball
+    m_Root.RemoveChild(m_Ball);
+    m_Ball->SetVisible(false);
+    m_Ball.reset();
+    m_Ball = std::make_shared<Ball>(RESOURCE_DIR"/Image/Ball/ball.png", true, glm::vec2{100,180});
+    m_Ball->SetZIndex(50);
+    m_Ball->SetPosition({m_Vaus->GetPosition().x, m_Vaus->GetPosition().y + m_Vaus->GetScaledSize().y/2 + m_Ball->GetScaledSize().y/2});
+    m_Ball->SetVisible(true);
+    m_Root.AddChild(m_Ball);
+
+    // Emptying lasers
+    for (auto& laser: m_Vaus->GetLasers()){
+        m_Root.RemoveChild(laser);
+    }
+    m_Vaus->ClearLasers();
+
+    //Restarting m_Vaus
+    m_Root.RemoveChild(m_Vaus);
+    m_Vaus->SetVisible(false);
+    m_Vaus.reset();
+    m_Vaus = std::make_shared<Character>(RESOURCE_DIR"/Image/Vaus/Normal0.png");
+    m_Vaus->SetZIndex(50);
+    m_Vaus->SetPosition({0, -300});
+    m_Vaus->SetVisible(true);
+    m_Root.AddChild(m_Vaus);
+
+    if (isSpawningPill){
+        isSpawningPill = false;
+        m_Pill->SetVisible(false);
+        m_Root.RemoveChild(m_Pill);
+        m_Pill.reset();
+    }
+}
+
+void App::UpdateLivesUI(){
+    if (m_lives != m_old_lives){
+        m_num_of_lives_Text->ChangeText(" x " + std::to_string(m_lives));
+        m_old_lives = m_lives;
     }
 }
 

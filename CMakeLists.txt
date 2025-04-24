@@ -49,6 +49,9 @@ add_executable(${PROJECT_NAME}
         src/Pill.cpp
         include/Laser.hpp
         src/Laser.cpp
+        include/GameText.hpp
+        src/GameText.cpp
+        src/Ball.cpp
 
 )
 

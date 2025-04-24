@@ -8,7 +8,7 @@ Pill::Pill(const std::string& imagePath, const Pill::PILL_TYPE& pill, const glm:
     SetPosition(pos);
     SetVelocity({0,-50});
     SetVisible(true);
-    SetZIndex(5);
+    SetZIndex(50);
 }
 
 

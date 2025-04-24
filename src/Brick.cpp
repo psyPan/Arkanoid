@@ -4,7 +4,6 @@
 #include "Brick.hpp"
 
 #include <iostream>
-#include <ostream>
 #include <random>
 Brick::Brick(const std::string& ImagePath,Brick::BRICK_TYPE brickType) : Entity(ImagePath), m_brickType(brickType){
     SetVisible(true);
@@ -32,7 +31,7 @@ void Brick::HandleCollisionWithBall(const std::shared_ptr<Ball>& ball){
     bounceAngle = std::max(-1.5f, std::min(1.5f, relativeIntersectX));
     // Increase speed a little
     float current_speed = glm::length(ball->GetVelocity());
-    float new_speed =  1.05 * current_speed;
+    float new_speed =  1.02 * current_speed;
     if (new_speed > ball->GetMaxSpeed()){
         new_speed = ball->GetMaxSpeed();
     }
@@ -86,7 +85,7 @@ glm::vec2 Brick::CalculatePenetrationDepth(const std::shared_ptr<Ball>& ball){
 }
 
 Pill::PILL_TYPE Brick::SpawnPill(){
-    std::random_device rd;
+    static std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<float> dis(0, 1);
     double randomValue = dis(gen);

@@ -45,6 +45,12 @@ public:
 
     void FireLaser(double currentTime, Util::Renderer& m_Root);
 
+    void SetStartingState(bool start) { m_StartingState = start; }
+
+    void ClearLasers(){
+        m_Lasers.clear();
+    }
+
     std::vector<std::shared_ptr<Laser>>& GetLasers() { return m_Lasers; }
 
     AABB GetAABB() const {
@@ -63,6 +69,8 @@ private:
     Pill::PILL_TYPE m_PillType = Pill::PILL_TYPE::NULL_Pill;
     std::vector<std::shared_ptr<Laser>> m_Lasers;
     double lastFireTime = 0;
+    bool m_StartingState = false;
+
 };
 
 

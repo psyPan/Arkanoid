@@ -7,6 +7,7 @@
 #include "pch.hpp" // IWYU pragma: export
 #include "Util/Renderer.hpp"
 #include "Entity.hpp"
+#include "GameText.hpp"
 #include "Util/Time.hpp"
 #include "Pill.hpp"
 
@@ -40,6 +41,10 @@ public:
 
     void CheckForCollision();
 
+    void RestartLevel();
+
+    void UpdateLivesUI();
+
 private:
     void ValidTask();
 
@@ -58,6 +63,13 @@ private:
     // Entity
     std::shared_ptr<Ball> m_Ball;
 
+    // Player lives display icon
+    std::shared_ptr<Entity> m_Icon;
+    // Lives text
+    std::shared_ptr<GameText> m_num_of_lives_Text;
+    int m_lives;
+    int m_old_lives = -1;
+
     // Pill
     std::shared_ptr<Pill> m_Pill;
     bool isSpawningPill = false;
@@ -66,6 +78,8 @@ private:
     Pill::PILL_TYPE pendingPillType;
     std::vector<std::shared_ptr<Brick>> bricksToRemove;
     int m_level;
+
+
 };
 
 #endif
