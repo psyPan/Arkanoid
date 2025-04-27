@@ -10,10 +10,11 @@
 
 Character::Character(const std::string& ImagePath) {
     SetImage(ImagePath);
-
     ResetPosition();
     lastFireTime = 0.0f;
     m_StartingState = true;
+    m_VausBallSound = std::make_shared<Util::SFX>(RESOURCE_DIR"/Sounds/Vaus_Ball_Touched.wav");
+    m_LaserSound = std::make_shared<Util::SFX>(RESOURCE_DIR"/Sounds/LaserSound.wav");
 }
 
 void Character::SetImage(const std::string& ImagePath) {
@@ -25,6 +26,7 @@ void Character::SetImage(const std::string& ImagePath) {
 const float MAX_BOUNCE_ANGLE = M_PI / 1.5; // 60 degrees
 void Character::HandleCollisionWithBall(const std::shared_ptr<Ball>& ball) {
     if (!m_StartingState){
+        m_VausBallSound->Play();
         ball->SetVelocity(glm::vec2{ball->GetVelocity().x, -ball->GetVelocity().y});
         // Calculate the relative position of the ball's impact on the paddle
         float relativeIntersectX = (ball->GetPosition().x - GetPosition().x) / GetScaledSize().x;
@@ -101,6 +103,7 @@ void Character::FireLaser(double currentTime, Util::Renderer& m_Root){
         lastFireTime = currentTime;
         m_Root.AddChild(laser1);
         m_Root.AddChild(laser2);
+        m_LaserSound->Play();
     }
 }
 

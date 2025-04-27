@@ -7,6 +7,12 @@
 #include "Entity.hpp"
 #include "Ball.hpp"
 #include "Pill.hpp"
+#include "Util/SFX.hpp"
+
+namespace Util
+{
+    class SFX;
+}
 
 class Brick : public Entity{
 public:
@@ -64,7 +70,7 @@ private:
     int m_hitCount;
     bool m_isDestroyed = false;
     BRICK_TYPE m_brickType;
-
+    std::shared_ptr<Util::SFX> m_BrickBallSound;
 };
 
 

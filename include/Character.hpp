@@ -12,6 +12,7 @@
 #include "Ball.hpp"
 #include "Laser.hpp"
 #include "Pill.hpp"
+#include "Util/SFX.hpp"
 
 class Character : public Util::GameObject {
 public:
@@ -53,6 +54,8 @@ public:
 
     std::vector<std::shared_ptr<Laser>>& GetLasers() { return m_Lasers; }
 
+    std::shared_ptr<Util::SFX> GetVausBallSound() { return m_VausBallSound; }
+
     AABB GetAABB() const {
         float halfWidth = GetScaledSize().x / 2.0f;
         float halfHeight = GetScaledSize().y / 2.0f;
@@ -70,7 +73,8 @@ private:
     std::vector<std::shared_ptr<Laser>> m_Lasers;
     double lastFireTime = 0;
     bool m_StartingState = false;
-
+    std::shared_ptr<Util::SFX> m_VausBallSound;
+    std::shared_ptr<Util::SFX> m_LaserSound;
 };
 
 

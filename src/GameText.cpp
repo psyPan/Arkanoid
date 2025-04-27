@@ -16,3 +16,7 @@ void GameText::ChangeText(const std::string text){
     auto temp = std::dynamic_pointer_cast<Util::Text>(m_Drawable);
     temp->SetText(text);
 }
+
+void GameText::SetPosition(glm::vec2 pos){
+    m_Transform.translation = pos;
+}

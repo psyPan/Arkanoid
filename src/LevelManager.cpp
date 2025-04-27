@@ -3,7 +3,7 @@
 //
 // Created by 潘雙永(HHA) on 2025/3/7.
 //
-std::vector<std::vector<Brick::BRICK_TYPE>> LevelManager::Level1_layout =
+std::vector<std::vector<Brick::BRICK_TYPE>> LevelManager::Level0_layout =
     {{Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER},
     {Brick::BRICK_TYPE::RED,Brick::BRICK_TYPE::RED,Brick::BRICK_TYPE::RED,Brick::BRICK_TYPE::RED,Brick::BRICK_TYPE::RED,Brick::BRICK_TYPE::RED,Brick::BRICK_TYPE::RED,Brick::BRICK_TYPE::RED,Brick::BRICK_TYPE::RED,Brick::BRICK_TYPE::RED,Brick::BRICK_TYPE::RED,Brick::BRICK_TYPE::RED,Brick::BRICK_TYPE::RED},
     {Brick::BRICK_TYPE::YELLOW,Brick::BRICK_TYPE::YELLOW,Brick::BRICK_TYPE::YELLOW,Brick::BRICK_TYPE::YELLOW,Brick::BRICK_TYPE::YELLOW,Brick::BRICK_TYPE::YELLOW,Brick::BRICK_TYPE::YELLOW,Brick::BRICK_TYPE::YELLOW,Brick::BRICK_TYPE::YELLOW,Brick::BRICK_TYPE::YELLOW,Brick::BRICK_TYPE::YELLOW,Brick::BRICK_TYPE::YELLOW,Brick::BRICK_TYPE::YELLOW},
@@ -12,7 +12,7 @@ std::vector<std::vector<Brick::BRICK_TYPE>> LevelManager::Level1_layout =
     {Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::GREEN,Brick::BRICK_TYPE::GREEN}
     };
 
-std::vector<std::vector<Brick::BRICK_TYPE>> LevelManager::Level2_layout =
+std::vector<std::vector<Brick::BRICK_TYPE>> LevelManager::Level1_layout =
     {{Brick::BRICK_TYPE::WHITE,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK},
     {Brick::BRICK_TYPE::WHITE,Brick::BRICK_TYPE::ORANGE,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK},
     {Brick::BRICK_TYPE::WHITE,Brick::BRICK_TYPE::ORANGE,Brick::BRICK_TYPE::LIGHT_BLUE,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK},
@@ -46,14 +46,14 @@ LevelManager::LevelManager(int level) : m_level(level){
 
 void LevelManager::SetLevelLayout(){
     switch (m_level){
+        case 0:
+            m_layout = Level0_layout;
+            break;
         case 1:
             m_layout = Level1_layout;
             break;
-        case 2:
-            m_layout = Level2_layout;
-            break;
         default:
-            m_layout = Level1_layout;
+            m_layout = Level0_layout;
     }
 }
 

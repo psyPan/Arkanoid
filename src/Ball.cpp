@@ -13,3 +13,7 @@ void Ball::SlowDownSpeed(){
     glm::vec2 newVelocity = glm::normalize(ballVel) * new_speed;
     SetVelocity(newVelocity);
 }
+
+void Ball::MaximizeSpeed(){
+    SetVelocity(normalize(GetVelocity()) * m_maxSpeed);
+}

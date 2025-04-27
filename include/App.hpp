@@ -10,6 +10,7 @@
 #include "GameText.hpp"
 #include "Util/Time.hpp"
 #include "Pill.hpp"
+#include "Util/SFX.hpp"
 
 class App {
 public:
@@ -41,9 +42,19 @@ public:
 
     void CheckForCollision();
 
-    void RestartLevel();
-
     void UpdateLivesUI();
+
+    void HandleInput();
+
+    void WhenPlayerLosesBall();
+
+    void ResumePlayerLosesBall();
+
+    void DetectGameOver();
+
+    void Restart(bool reset);
+
+    void InitGame(bool reset);
 
 private:
     void ValidTask();
@@ -76,10 +87,14 @@ private:
     bool shouldReplaceVaus = false; // For Blue and Red powerup
     bool otherPowerUp = false; // Except blue and red powerup
     Pill::PILL_TYPE pendingPillType;
+
     std::vector<std::shared_ptr<Brick>> bricksToRemove;
     int m_level;
+    bool m_gameIsRunning;
+    bool m_gameOver;
 
-
+    std::shared_ptr<GameText> m_AnnouncementText;
+    std::shared_ptr<Util::SFX> m_GameOverSFX;
 };
 
 #endif

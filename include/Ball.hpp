@@ -32,6 +32,8 @@ public:
 
     void SlowDownSpeed();
 
+    void MaximizeSpeed();
+
 };
 
 #endif //BALL_HPP

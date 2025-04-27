@@ -7,11 +7,14 @@
 #include <random>
 Brick::Brick(const std::string& ImagePath,Brick::BRICK_TYPE brickType) : Entity(ImagePath), m_brickType(brickType){
     SetVisible(true);
-    SetZIndex(5);
+    SetZIndex(50);
+    m_BrickBallSound = std::make_shared<Util::SFX>(RESOURCE_DIR"/Sounds/Brick_Ball_Touched.wav");
+
 }
 
 const float MAX_BOUNCE_ANGLE = M_PI / 1.0; // 60 degrees
 void Brick::HandleCollisionWithBall(const std::shared_ptr<Ball>& ball){
+    m_BrickBallSound->Play();
     glm::vec2 ballVel = ball->GetVelocity();
     float relativeIntersectX = 0.0f;
     if (ballVel.y > 0){
