@@ -312,11 +312,14 @@ void App::UpdateLivesUI(){
 }
 
 void App::HandleInput(){
-    if (Util::Input::IsKeyUp(Util::Keycode::P)){
+
+    if ((!m_ballOutOfBound) && (Util::Input::IsKeyUp(Util::Keycode::P))){
         m_gameIsRunning = !m_gameIsRunning;
     }
     if (!m_gameIsRunning){
-        m_AnnouncementText->ChangeText("Game is paused.\nPress (P) to play.");
+        if (!m_ballOutOfBound){
+            m_AnnouncementText->ChangeText("Game is paused.\nPress (P) to play.");
+        }
     }
     else{
         m_AnnouncementText->ChangeText("Game is running.\nPress (P) to pause.");
@@ -352,9 +355,10 @@ void App::HandleInput(){
         }
 
     }
-
-    if (Util::Input::IsKeyUp(Util::Keycode::R)){
-        ResumePlayerLosesBall();
+    if (m_ballOutOfBound){
+        if (Util::Input::IsKeyUp(Util::Keycode::R)){
+            ResumePlayerLosesBall();
+        }
     }
 
     if (m_gameOver){
@@ -371,6 +375,7 @@ void App::HandleInput(){
 void App::WhenPlayerLosesBall(){
     if (-(m_Ball->GetPosition().y - m_Ball->GetScaledSize().y / 2) >= m_LevelManager->GetBackgroundImage()->GetScaledSize().y / 2 + 50){
         m_lives--;
+        m_ballOutOfBound = true;
         m_AnnouncementText->ChangeText("You lost the ball.\nOne live is deducted.\nCurrent lives = " + std::to_string(m_lives)+ "\nPress (R) to resume.");
         m_AnnouncementText->SetPosition(glm::vec2{480,200});
         m_gameIsRunning = false;
@@ -380,6 +385,7 @@ void App::WhenPlayerLosesBall(){
 void App::ResumePlayerLosesBall(){
     m_AnnouncementText->ChangeText("Game is running.\n Press (P) to pause.");
     m_gameIsRunning = true;
+    m_ballOutOfBound = false;
     m_Vaus->SetStartingState(true);
     m_Vaus->SetImage(RESOURCE_DIR"/Image/Vaus/Normal0.png");
 
@@ -462,6 +468,7 @@ void App::InitGame(bool reset){
         m_gameIsRunning = true;
         m_gameOver = false;
         m_CurrentState = State::UPDATE;
+        m_ballOutOfBound = false;
 
     }
     m_LevelManager = std::make_shared<LevelManager>(m_level);

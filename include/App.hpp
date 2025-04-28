@@ -92,6 +92,7 @@ private:
     int m_level;
     bool m_gameIsRunning;
     bool m_gameOver;
+    bool m_ballOutOfBound;
 
     std::shared_ptr<GameText> m_AnnouncementText;
     std::shared_ptr<Util::SFX> m_GameOverSFX;
