@@ -13,6 +13,7 @@ private:
     glm::vec2 m_velocity = glm::vec2{0,0};
     float m_maxSpeed;
     float m_minSpeed;
+    float m_sticking_Pos_X;
 
 public:
     explicit Ball(const std::string& ImagePath, const bool& IsSticky, const glm::vec2& velocity)
@@ -33,6 +34,10 @@ public:
     void SlowDownSpeed();
 
     void MaximizeSpeed();
+
+    void SetStickingPosX(float pos){m_sticking_Pos_X = pos;}
+
+    float GetStickingPosX() const { return m_sticking_Pos_X; }
 
 };
 

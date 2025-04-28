@@ -27,7 +27,6 @@ void LogBrickType(Brick::BRICK_TYPE brickType) {
 
 void App::Start() {
     InitGame(true); // reset is true to make the game starting from level 1, lives with 3.
-
 }
 
 void App::Update() {
@@ -46,7 +45,12 @@ void App::Update() {
 
         // m_ball is sticky or not
         if (m_Ball->IsSticky()){
-            m_Ball->SetPosition({m_Vaus->GetPosition().x + 5, m_Vaus->GetPosition().y + m_Vaus->GetScaledSize().y/2 + m_Ball->GetScaledSize().y/2});
+            if (!m_ball_Stucked){
+                m_Ball->SetPosition({m_Vaus->GetPosition().x + 5, m_Vaus->GetPosition().y + m_Vaus->GetScaledSize().y/2 + m_Ball->GetScaledSize().y/2});
+            }
+            else{
+                m_Ball->SetPosition({m_Ball->GetPosition().x, m_Vaus->GetPosition().y + m_Vaus->GetScaledSize().y/2 + m_Ball->GetScaledSize().y/2});
+            }
         }
 
         if (!m_Ball->IsSticky()){
@@ -74,7 +78,7 @@ void App::Update() {
         }
 
         // Collision between m_Vaus and m_Ball
-        if (m_Vaus->GetAABB().Intersects(m_Ball->GetAABB())) {
+        if ((m_Vaus->GetAABB().Intersects(m_Ball->GetAABB())) && (!m_ball_Stucked)) {
             m_Vaus->HandleCollisionWithBall(m_Ball);
         }
 
@@ -128,6 +132,9 @@ void App::Update() {
         WhenPlayerLosesBall();
 
         DetectGameOver();
+
+        VausHoldBall();
+
     }
     if (Util::Input::IsKeyUp(Util::Keycode::ESCAPE) ||
         Util::Input::IfExit()) {
@@ -191,6 +198,9 @@ void App::CreatePill(const Pill::PILL_TYPE& pill, const glm::vec2& pos){
 }
 
 void App::VausPowerUp(){
+    m_has_Glue = false;
+    m_Ball->SetIsSticky(false);
+    m_ball_Stucked = false;
     glm::vec2 currentPos = m_Vaus->GetPosition();
     for (auto& laser: m_Vaus->GetLasers()){
         m_Root.RemoveChild(laser);
@@ -215,22 +225,47 @@ void App::VausPowerUp(){
 void App::OtherPowerUp(){
     switch (pendingPillType){
         case Pill::PILL_TYPE::GREEN:
-            // m_Ball->SetIsSticky(true);
+            m_has_Glue = true;
             break;
         case Pill::PILL_TYPE::GREY:
+            m_has_Glue = false;
+            m_ball_Stucked = false;
+            m_Ball->SetIsSticky(false);
             m_lives++;
             break;
         case Pill::PILL_TYPE::PINK:
+            m_has_Glue = false;
+            m_ball_Stucked = false;
+            m_Ball->SetIsSticky(false);
             m_level++;
             Restart(false);
             InitGame(false);
             break;
         case Pill::PILL_TYPE::LIGHTBLUE:
+            m_has_Glue = false;
+            m_ball_Stucked = false;
+            m_Ball->SetIsSticky(false);
             std::cout << "LIGHTBLUE" << std::endl;
             break;
         case Pill::PILL_TYPE::ORANGE:
+            m_has_Glue = false;
+            m_ball_Stucked = false;
+            m_Ball->SetIsSticky(false);
             m_Ball->SlowDownSpeed();
             break;
+    }
+}
+
+void App::VausHoldBall(){
+    if (m_has_Glue){
+        m_Vaus->SetImage(RESOURCE_DIR"/Image/Vaus/Normal0.png");
+        if (m_Vaus->GetAABB().Intersects(m_Ball->GetAABB())){
+            m_Ball->SetPosition(glm::vec2{m_Ball->GetPosition().x, m_Vaus->GetPosition().y + m_Vaus->GetScaledSize().y/2 + m_Ball->GetScaledSize().y/2});
+            m_ball_Stucked = true;
+            m_Ball->SetIsSticky(true);
+            m_Ball->SetStickingPosX(abs(m_Ball->GetPosition().x - m_Vaus->GetPosition().x));
+
+        }
     }
 }
 
@@ -333,12 +368,30 @@ void App::HandleInput(){
             if (m_Vaus->GetPosition().x < leftBorder){
                 m_Vaus->SetPosition({leftBorder, m_Vaus->GetPosition().y});
             }
+            if (m_ball_Stucked){
+                if (m_Ball->GetPosition().x > m_Vaus->GetPosition().x){
+                    m_Ball->SetPosition(glm::vec2{m_Vaus->GetPosition().x + m_Ball->GetStickingPosX(), m_Vaus->GetPosition().y + m_Vaus->GetScaledSize().y/2 + m_Ball->GetScaledSize().y/2});
+                }
+                else{
+                    m_Ball->SetPosition(glm::vec2{m_Vaus->GetPosition().x - m_Ball->GetStickingPosX(), m_Vaus->GetPosition().y + m_Vaus->GetScaledSize().y/2 + m_Ball->GetScaledSize().y/2});
+
+                }
+            }
         }
         else if (Util::Input::IsKeyPressed(Util::Keycode::D)){
             m_Vaus->SetPosition({m_Vaus->GetPosition().x + 10, m_Vaus->GetPosition().y});
             float rightBorder = ((m_LevelManager->GetBackgroundImage()->GetScaledSize().x / 2 - 24) - m_Vaus->GetScaledSize().x / 2);
             if (m_Vaus->GetPosition().x > rightBorder){
                 m_Vaus->SetPosition({rightBorder, m_Vaus->GetPosition().y});
+            }
+            if (m_ball_Stucked){
+                if (m_Ball->GetPosition().x > m_Vaus->GetPosition().x){
+                    m_Ball->SetPosition(glm::vec2{m_Vaus->GetPosition().x + m_Ball->GetStickingPosX(), m_Vaus->GetPosition().y + m_Vaus->GetScaledSize().y/2 + m_Ball->GetScaledSize().y/2});
+                }
+                else{
+                    m_Ball->SetPosition(glm::vec2{m_Vaus->GetPosition().x - m_Ball->GetStickingPosX(), m_Vaus->GetPosition().y + m_Vaus->GetScaledSize().y/2 + m_Ball->GetScaledSize().y/2});
+
+                }
             }
         }
         if (m_Ball->IsSticky() && Util::Input::IsKeyPressed(Util::Keycode::SPACE)){
@@ -351,6 +404,14 @@ void App::HandleInput(){
             // Vaus shooting laser
             if (Util::Input::IsKeyPressed(Util::Keycode::SPACE)){
                 m_Vaus->FireLaser(m_Time.GetElapsedTimeMs(), m_Root);
+            }
+        }
+
+        if (m_has_Glue){
+            if ((m_ball_Stucked) && (Util::Input::IsKeyPressed(Util::Keycode::SPACE))){
+                m_Vaus->GetVausBallSound()->Play();
+                m_ball_Stucked = false;
+                m_Ball->SetIsSticky(false);
             }
         }
 
@@ -386,10 +447,11 @@ void App::ResumePlayerLosesBall(){
     m_AnnouncementText->ChangeText("Game is running.\n Press (P) to pause.");
     m_gameIsRunning = true;
     m_ballOutOfBound = false;
+    m_has_Glue = false;
     m_Vaus->SetStartingState(true);
     m_Vaus->SetImage(RESOURCE_DIR"/Image/Vaus/Normal0.png");
 
-    m_Ball->SetVelocity(glm::vec2{100,180});
+    m_Ball->SetVelocity(glm::vec2{200,400});
     m_Ball->SetIsSticky(true);
     m_Ball->SetPosition({m_Vaus->GetPosition().x, m_Vaus->GetPosition().y + m_Vaus->GetScaledSize().y/2 + m_Ball->GetScaledSize().y/2});
     if (isSpawningPill){
@@ -469,7 +531,8 @@ void App::InitGame(bool reset){
         m_gameOver = false;
         m_CurrentState = State::UPDATE;
         m_ballOutOfBound = false;
-
+        m_has_Glue = false;
+        m_ball_Stucked = false;
     }
     m_LevelManager = std::make_shared<LevelManager>(m_level);
     m_Root.AddChild(m_LevelManager->GetChild());
@@ -503,7 +566,7 @@ void App::InitGame(bool reset){
     m_Root.AddChild(m_AnnouncementText);
 
     // Ball
-    m_Ball = std::make_shared<Ball>(RESOURCE_DIR"/Image/Ball/ball.png", true, glm::vec2{100,180});
+    m_Ball = std::make_shared<Ball>(RESOURCE_DIR"/Image/Ball/ball.png", true, glm::vec2{200,400});
     m_Ball->SetZIndex(50);
     m_Ball->SetPosition({m_Vaus->GetPosition().x, m_Vaus->GetPosition().y + m_Vaus->GetScaledSize().y/2 + m_Ball->GetScaledSize().y/2});
     m_Ball->SetVisible(true);

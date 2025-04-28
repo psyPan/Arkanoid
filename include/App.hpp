@@ -38,6 +38,8 @@ public:
 
     void OtherPowerUp();
 
+    void VausHoldBall();
+
     void DeleteInactiveLasers();
 
     void CheckForCollision();
@@ -87,6 +89,10 @@ private:
     bool shouldReplaceVaus = false; // For Blue and Red powerup
     bool otherPowerUp = false; // Except blue and red powerup
     Pill::PILL_TYPE pendingPillType;
+
+    // Bools for developing Green Pill power.
+    bool m_has_Glue;
+    bool m_ball_Stucked;
 
     std::vector<std::shared_ptr<Brick>> bricksToRemove;
     int m_level;

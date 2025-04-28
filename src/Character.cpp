@@ -45,14 +45,11 @@ void Character::HandleCollisionWithBall(const std::shared_ptr<Ball>& ball) {
         bounceAngle = std::max(-1.0f, std::min(1.0f, bounceAngle));
         // Increase speed a little
         float current_speed = glm::length(ball->GetVelocity());
-        float new_speed =  1.02 * current_speed;
-        if (new_speed > ball->GetMaxSpeed()){
-            new_speed = ball->GetMaxSpeed();
-        }
+
         glm::vec2 newVelocity;
         // Calculate the new velocity components
-        newVelocity.x = new_speed * std::sin(bounceAngle);
-        newVelocity.y = new_speed * std::cos(bounceAngle);
+        newVelocity.x = current_speed * std::sin(bounceAngle);
+        newVelocity.y = current_speed * std::cos(bounceAngle);
 
         // Set the new velocity
         ball->SetVelocity(newVelocity);

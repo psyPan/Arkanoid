@@ -48,9 +48,13 @@ void LevelManager::SetLevelLayout(){
     switch (m_level){
         case 0:
             m_layout = Level0_layout;
+            m_startPos.x = 0 - (m_backgroundImage->GetScaledSize().x / 2) + 48;
+            m_startPos.y = (m_backgroundImage->GetScaledSize().y / 2 - 24) - ((m_backgroundImage->GetScaledSize().y - 24) / 5) + 20;
             break;
         case 1:
             m_layout = Level1_layout;
+            m_startPos.x = 0 - (m_backgroundImage->GetScaledSize().x / 2) + 48;
+            m_startPos.y = (m_backgroundImage->GetScaledSize().y / 2 - 24) - ((m_backgroundImage->GetScaledSize().y - 24) / 5) + 65;
             break;
         default:
             m_layout = Level0_layout;
@@ -77,12 +81,9 @@ std::shared_ptr<Brick> LevelManager::PrimaryCollidedBrick(const std::shared_ptr<
 void LevelManager::CreateBrick(Util::Renderer& m_Root){
     for (auto i = 0; i < m_layout.size(); i++){
         for (auto j = 0; j < m_layout[0].size(); j++){
-            glm::vec2 start_pos;
-            start_pos.x = 0 - (m_backgroundImage->GetScaledSize().x / 2) + 48;
-            start_pos.y = (m_backgroundImage->GetScaledSize().y / 2 - 24) - ((m_backgroundImage->GetScaledSize().y - 24) / 5) + 20;
             if (m_layout[i][j] == Brick::BRICK_TYPE::SILVER){
                 std::string imagePath = RESOURCE_DIR"/Image/Brick/Silver.png";
-                SetupBricks(imagePath, Brick::BRICK_TYPE::SILVER, m_bricks, m_Root, start_pos, i, j, 2);
+                SetupBricks(imagePath, Brick::BRICK_TYPE::SILVER, m_bricks, m_Root, m_startPos, i, j, 2);
             }
             else if (m_layout[i][j] == Brick::BRICK_TYPE::GOLD){
                 std::shared_ptr<Brick> brick = std::make_shared<Brick>(RESOURCE_DIR"/Image/Brick/Gold.png", Brick::BRICK_TYPE::GOLD);
@@ -90,35 +91,35 @@ void LevelManager::CreateBrick(Util::Renderer& m_Root){
             }
             else if (m_layout[i][j] == Brick::BRICK_TYPE::RED){
                 std::string imagePath = RESOURCE_DIR"/Image/Brick/Red.png";
-                SetupBricks(imagePath, Brick::BRICK_TYPE::RED, m_bricks, m_Root, start_pos, i, j, 1);
+                SetupBricks(imagePath, Brick::BRICK_TYPE::RED, m_bricks, m_Root, m_startPos, i, j, 1);
             }
             else if (m_layout[i][j] == Brick::BRICK_TYPE::YELLOW){
                 std::string imagePath = RESOURCE_DIR"/Image/Brick/Yellow.png";
-                SetupBricks(imagePath, Brick::BRICK_TYPE::YELLOW, m_bricks, m_Root, start_pos, i, j, 1);
+                SetupBricks(imagePath, Brick::BRICK_TYPE::YELLOW, m_bricks, m_Root, m_startPos, i, j, 1);
             }
             else if (m_layout[i][j] == Brick::BRICK_TYPE::BLUE){
                 std::string imagePath = RESOURCE_DIR"/Image/Brick/Blue.png";
-                SetupBricks(imagePath, Brick::BRICK_TYPE::BLUE, m_bricks, m_Root, start_pos, i, j, 1);
+                SetupBricks(imagePath, Brick::BRICK_TYPE::BLUE, m_bricks, m_Root, m_startPos, i, j, 1);
             }
             else if (m_layout[i][j] == Brick::BRICK_TYPE::PINK){
                 std::string imagePath = RESOURCE_DIR"/Image/Brick/Pink.png";
-                SetupBricks(imagePath,Brick::BRICK_TYPE::PINK, m_bricks, m_Root, start_pos, i, j, 1);
+                SetupBricks(imagePath,Brick::BRICK_TYPE::PINK, m_bricks, m_Root, m_startPos, i, j, 1);
             }
             else if (m_layout[i][j] == Brick::BRICK_TYPE::GREEN){
                 std::string imagePath = RESOURCE_DIR"/Image/Brick/Green.png";
-                SetupBricks(imagePath,Brick::BRICK_TYPE::GREEN, m_bricks, m_Root, start_pos, i, j, 1);
+                SetupBricks(imagePath,Brick::BRICK_TYPE::GREEN, m_bricks, m_Root, m_startPos, i, j, 1);
             }
             else if (m_layout[i][j] == Brick::BRICK_TYPE::WHITE){
                 std::string imagePath = RESOURCE_DIR"/Image/Brick/White.png";
-                SetupBricks(imagePath, Brick::BRICK_TYPE::WHITE, m_bricks, m_Root, start_pos, i, j, 1);
+                SetupBricks(imagePath, Brick::BRICK_TYPE::WHITE, m_bricks, m_Root, m_startPos, i, j, 1);
             }
             else if (m_layout[i][j] == Brick::BRICK_TYPE::LIGHT_BLUE){
                 std::string imagePath = RESOURCE_DIR"/Image/Brick/LightBlue.png";
-                SetupBricks(imagePath, Brick::BRICK_TYPE::LIGHT_BLUE, m_bricks, m_Root, start_pos, i, j, 1);
+                SetupBricks(imagePath, Brick::BRICK_TYPE::LIGHT_BLUE, m_bricks, m_Root, m_startPos, i, j, 1);
             }
             else if (m_layout[i][j] == Brick::BRICK_TYPE::ORANGE){
                 std::string imagePath = RESOURCE_DIR"/Image/Brick/Orange.png";
-                SetupBricks(imagePath, Brick::BRICK_TYPE::ORANGE, m_bricks, m_Root, start_pos, i, j, 1);
+                SetupBricks(imagePath, Brick::BRICK_TYPE::ORANGE, m_bricks, m_Root, m_startPos, i, j, 1);
             }
         }
     }

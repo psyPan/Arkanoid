@@ -16,6 +16,7 @@ private:
     std::vector<std::shared_ptr<Brick>> m_bricks;
     int m_level = 1;
     std::vector<std::vector<Brick::BRICK_TYPE>> m_layout;
+    glm::vec2 m_startPos;
 
 public:
     LevelManager(int level);
