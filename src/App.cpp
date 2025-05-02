@@ -1,5 +1,4 @@
 #include "App.hpp"
-
 #include "Util/Image.hpp"
 #include "Util/Input.hpp"
 #include "Util/Keycode.hpp"
@@ -7,23 +6,6 @@
 #include "Brick.hpp"
 #include "GameText.hpp"
 #include "Util/SFX.hpp"
-
-void LogBrickType(Brick::BRICK_TYPE brickType) {
-    switch (brickType) {
-        case Brick::BRICK_TYPE::NULL_BRICK: std::cout << "Brick Type: NULL_BRICK: "; break;
-        case Brick::BRICK_TYPE::GOLD: std::cout << "Brick Type: GOLD: "; break;
-        case Brick::BRICK_TYPE::SILVER: std::cout << "Brick Type: SILVER: "; break;
-        case Brick::BRICK_TYPE::WHITE: std::cout << "Brick Type: WHITE: "; break;
-        case Brick::BRICK_TYPE::RED: std::cout << "Brick Type: RED: "; break;
-        case Brick::BRICK_TYPE::GREEN: std::cout << "Brick Type: GREEN: "; break;
-        case Brick::BRICK_TYPE::BLUE: std::cout << "Brick Type: BLUE: "; break;
-        case Brick::BRICK_TYPE::YELLOW: std::cout << "Brick Type: YELLOW: "; break;
-        case Brick::BRICK_TYPE::LIGHT_BLUE: std::cout << "Brick Type: LIGHT_BLUE: "; break;
-        case Brick::BRICK_TYPE::PINK: std::cout << "Brick Type: PINK: "; break;
-        case Brick::BRICK_TYPE::ORANGE: std::cout << "Brick Type: ORANGE: "; break;
-        default: std::cout << "Brick Type: UNKNOWN: "; break;
-    }
-}
 
 void App::Start() {
     InitGame(true); // reset is true to make the game starting from level 1, lives with 3.
@@ -434,7 +416,7 @@ void App::HandleInput(){
 }
 
 void App::WhenPlayerLosesBall(){
-    if (-(m_Ball->GetPosition().y - m_Ball->GetScaledSize().y / 2) >= m_LevelManager->GetBackgroundImage()->GetScaledSize().y / 2 + 50){
+    if ((-(m_Ball->GetPosition().y - m_Ball->GetScaledSize().y / 2) >= m_LevelManager->GetBackgroundImage()->GetScaledSize().y / 2 + 50) && (m_active_ball_count == 1)) {
         m_lives--;
         m_ballOutOfBound = true;
         m_AnnouncementText->ChangeText("You lost the ball.\nOne live is deducted.\nCurrent lives = " + std::to_string(m_lives)+ "\nPress (R) to resume.");
@@ -533,6 +515,7 @@ void App::InitGame(bool reset){
         m_ballOutOfBound = false;
         m_has_Glue = false;
         m_ball_Stucked = false;
+        m_active_ball_count = 1;
     }
     m_LevelManager = std::make_shared<LevelManager>(m_level);
     m_Root.AddChild(m_LevelManager->GetChild());

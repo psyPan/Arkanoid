@@ -42,9 +42,7 @@ LevelManager::LevelManager(int level) : m_level(level){
     m_backgroundImage = std::make_shared<BackgroundImage>(m_level);
     m_backgroundImage->SetBackGroundImage();
     SetLevelLayout();
-}
-
-void LevelManager::SetLevelLayout(){
+}void LevelManager::SetLevelLayout(){
     switch (m_level){
         case 0:
             m_layout = Level0_layout;
@@ -60,6 +58,8 @@ void LevelManager::SetLevelLayout(){
             m_layout = Level0_layout;
     }
 }
+
+
 
 std::shared_ptr<Brick> LevelManager::PrimaryCollidedBrick(const std::shared_ptr<Ball>& ball){
     std::shared_ptr<Brick> primaryBrick = nullptr;

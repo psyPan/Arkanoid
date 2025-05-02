@@ -17,3 +17,7 @@ void Ball::SlowDownSpeed(){
 void Ball::MaximizeSpeed(){
     SetVelocity(normalize(GetVelocity()) * m_maxSpeed);
 }
+
+bool Ball::IsOutOfBound(const std::shared_ptr<LevelManager>& lvlmanager){
+    return (-(GetPosition().y - GetScaledSize().y / 2) >= lvlmanager->GetBackgroundImage()->GetScaledSize().y / 2 + 50);
+}

@@ -94,6 +94,10 @@ private:
     bool m_has_Glue;
     bool m_ball_Stucked;
 
+    // Attributes for developing LightBlue Pill Power
+    std::vector<std::shared_ptr<Ball>> m_Balls;
+    int m_active_ball_count;
+
     std::vector<std::shared_ptr<Brick>> bricksToRemove;
     int m_level;
     bool m_gameIsRunning;

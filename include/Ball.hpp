@@ -6,6 +6,7 @@
 #define BALL_HPP
 
 #include "Entity.hpp"
+#include "LevelManager.hpp"
 
 class Ball : public Entity{
 private:
@@ -38,6 +39,8 @@ public:
     void SetStickingPosX(float pos){m_sticking_Pos_X = pos;}
 
     float GetStickingPosX() const { return m_sticking_Pos_X; }
+
+    bool IsOutOfBound(const std::shared_ptr<LevelManager>& lvlmanager);
 
 };
 
