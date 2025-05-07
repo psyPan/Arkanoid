@@ -5,7 +5,7 @@
 
 #include <iostream>
 #include <random>
-Brick::Brick(const std::string& ImagePath,Brick::BRICK_TYPE brickType) : Entity(ImagePath), m_brickType(brickType){
+Brick::Brick(const std::string& ImagePath,Brick::BRICK_TYPE brickType, int point) : Entity(ImagePath), m_brickType(brickType), m_point(point) {
     SetVisible(true);
     SetZIndex(50);
     m_BrickBallSound = std::make_shared<Util::SFX>(RESOURCE_DIR"/Sounds/Brick_Ball_Touched.wav");

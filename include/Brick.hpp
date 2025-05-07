@@ -29,7 +29,7 @@ public:
         PINK,
         ORANGE,
     };
-    explicit Brick(const std::string& ImagePath, Brick::BRICK_TYPE brickType);
+    explicit Brick(const std::string& ImagePath, Brick::BRICK_TYPE brickType, int point);
 
     void SetHitCount(int hits) { m_hitCount = hits; }
 
@@ -65,9 +65,12 @@ public:
 
     Pill::PILL_TYPE SpawnPill();
 
+    void SetPoint(int point){m_point = point;}
+    int GetPoint() const { return m_point; }
 
 private:
     int m_hitCount;
+    int m_point;
     bool m_isDestroyed = false;
     BRICK_TYPE m_brickType;
     std::shared_ptr<Util::SFX> m_BrickBallSound;

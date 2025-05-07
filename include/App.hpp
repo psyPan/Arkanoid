@@ -40,7 +40,11 @@ public:
 
     void VausHoldBall();
 
+    void ActivateDisruption();
+
     void DeleteInactiveLasers();
+
+    void DeleteInactiveBall();
 
     void CheckForCollision();
 
@@ -58,6 +62,10 @@ public:
 
     void InitGame(bool reset);
 
+    glm::vec2 RotateVector(const glm::vec2& vec, float angle);
+
+    void UpdateScoreText();
+
 private:
     void ValidTask();
 
@@ -72,9 +80,8 @@ private:
 
     // Character
     std::shared_ptr<Character> m_Vaus;
-
-    // Entity
-    std::shared_ptr<Ball> m_Ball;
+    std::vector<std::shared_ptr<Ball>> m_Balls;
+    int m_active_ball_count;
 
     // Player lives display icon
     std::shared_ptr<Entity> m_Icon;
@@ -94,10 +101,6 @@ private:
     bool m_has_Glue;
     bool m_ball_Stucked;
 
-    // Attributes for developing LightBlue Pill Power
-    std::vector<std::shared_ptr<Ball>> m_Balls;
-    int m_active_ball_count;
-
     std::vector<std::shared_ptr<Brick>> bricksToRemove;
     int m_level;
     bool m_gameIsRunning;
@@ -106,6 +109,9 @@ private:
 
     std::shared_ptr<GameText> m_AnnouncementText;
     std::shared_ptr<Util::SFX> m_GameOverSFX;
+
+    int m_score = 0;
+    std::shared_ptr<GameText> m_scoreText;
 };
 
 #endif

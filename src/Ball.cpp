@@ -2,6 +2,7 @@
 // Created by 潘雙永(HHA) on 2025/4/24.
 //
 #include "Ball.hpp"
+#include "LevelManager.hpp"
 
 void Ball::SlowDownSpeed(){
     glm::vec2 ballVel = GetVelocity();

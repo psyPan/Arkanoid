@@ -5,6 +5,7 @@
 #include "Util/Logger.hpp"
 #include "Brick.hpp"
 #include "GameText.hpp"
+#include "Util/Animation.hpp"
 #include "Util/SFX.hpp"
 
 void App::Start() {
@@ -24,44 +25,45 @@ void App::Update() {
             InitGame(false);
         }
 
-
-        // m_ball is sticky or not
-        if (m_Ball->IsSticky()){
-            if (!m_ball_Stucked){
-                m_Ball->SetPosition({m_Vaus->GetPosition().x + 5, m_Vaus->GetPosition().y + m_Vaus->GetScaledSize().y/2 + m_Ball->GetScaledSize().y/2});
+        for (auto i = 0; i < m_Balls.size(); i++){
+            // m_ball is sticky or not
+            if (m_Balls[i]->IsSticky()){
+                if (!m_ball_Stucked){
+                    m_Balls[i]->SetPosition({m_Vaus->GetPosition().x + 5, m_Vaus->GetPosition().y + m_Vaus->GetScaledSize().y/2 + m_Balls[i]->GetScaledSize().y/2});
+                }
+                else{
+                    m_Balls[i]->SetPosition({m_Balls[i]->GetPosition().x, m_Vaus->GetPosition().y + m_Vaus->GetScaledSize().y/2 + m_Balls[i]->GetScaledSize().y/2});
+                }
             }
-            else{
-                m_Ball->SetPosition({m_Ball->GetPosition().x, m_Vaus->GetPosition().y + m_Vaus->GetScaledSize().y/2 + m_Ball->GetScaledSize().y/2});
+
+            if (!m_Balls[i]->IsSticky()){
+                m_Vaus->SetStartingState(false);
+                m_Balls[i]->SetPosition({m_Balls[i]->GetPosition().x + (m_Balls[i]->GetVelocity().x * m_Time.GetDeltaTime()), m_Balls[i]->GetPosition().y + (m_Balls[i]->GetVelocity().y * m_Time.GetDeltaTime())});
+                // "speed * GetDeltaTime" to have uniform speed on PCs with different FPS.
             }
-        }
 
-        if (!m_Ball->IsSticky()){
-            m_Vaus->SetStartingState(false);
-            m_Ball->SetPosition({m_Ball->GetPosition().x + (m_Ball->GetVelocity().x * m_Time.GetDeltaTime()), m_Ball->GetPosition().y + (m_Ball->GetVelocity().y * m_Time.GetDeltaTime())});
-            // "speed * GetDeltaTime" to have uniform speed on PCs with different FPS.
-        }
+            // Bouncing against the border
+            // Right border
+            if (m_Balls[i]->GetPosition().x + m_Balls[i]->GetScaledSize().x / 2 > (m_LevelManager->GetBackgroundImage()->GetScaledSize().x / 2 - 24)){
+                m_Balls[i]->SetPosition({m_LevelManager->GetBackgroundImage()->GetScaledSize().x / 2 - 24 - m_Balls[i]->GetScaledSize().x / 2, m_Balls[i]->GetPosition().y});
+                m_Balls[i]->SetVelocity(glm::vec2{-m_Balls[i]->GetVelocity().x, m_Balls[i]->GetVelocity().y});
+            }
+            // Upper border
+            if (m_Balls[i]->GetPosition().y + m_Balls[i]->GetScaledSize().y / 2 > (m_LevelManager->GetBackgroundImage()->GetScaledSize().y / 2 - 24)){
+                m_Balls[i]->SetPosition({m_Balls[i]->GetPosition().x, m_LevelManager->GetBackgroundImage()->GetScaledSize().y / 2 - 24 - m_Balls[i]->GetScaledSize().y / 2});
+                m_Balls[i]->SetVelocity(glm::vec2{m_Balls[i]->GetVelocity().x, -m_Balls[i]->GetVelocity().y});
+                m_Balls[i]->MaximizeSpeed();
+            }
+            // Left border
+            if (m_Balls[i]->GetPosition().x - m_Balls[i]->GetScaledSize().x / 2 < -(m_LevelManager->GetBackgroundImage()->GetScaledSize().x / 2 - 24)){
+                m_Balls[i]->SetPosition({ -m_LevelManager->GetBackgroundImage()->GetScaledSize().x / 2 + 24 + m_Balls[i]->GetScaledSize().x / 2, m_Balls[i]->GetPosition().y});
+                m_Balls[i]->SetVelocity(glm::vec2{-m_Balls[i]->GetVelocity().x, m_Balls[i]->GetVelocity().y});
+            }
 
-        // Bouncing against the border
-        // Right border
-        if (m_Ball->GetPosition().x + m_Ball->GetScaledSize().x / 2 > (m_LevelManager->GetBackgroundImage()->GetScaledSize().x / 2 - 24)){
-            m_Ball->SetPosition({m_LevelManager->GetBackgroundImage()->GetScaledSize().x / 2 - 24 - m_Ball->GetScaledSize().x / 2, m_Ball->GetPosition().y});
-            m_Ball->SetVelocity(glm::vec2{-m_Ball->GetVelocity().x, m_Ball->GetVelocity().y});
-        }
-        // Upper border
-        if (m_Ball->GetPosition().y + m_Ball->GetScaledSize().y / 2 > (m_LevelManager->GetBackgroundImage()->GetScaledSize().y / 2 - 24)){
-            m_Ball->SetPosition({m_Ball->GetPosition().x, m_LevelManager->GetBackgroundImage()->GetScaledSize().y / 2 - 24 - m_Ball->GetScaledSize().y / 2});
-            m_Ball->SetVelocity(glm::vec2{m_Ball->GetVelocity().x, -m_Ball->GetVelocity().y});
-            m_Ball->MaximizeSpeed();
-        }
-        // Left border
-        if (m_Ball->GetPosition().x - m_Ball->GetScaledSize().x / 2 < -(m_LevelManager->GetBackgroundImage()->GetScaledSize().x / 2 - 24)){
-            m_Ball->SetPosition({ -m_LevelManager->GetBackgroundImage()->GetScaledSize().x / 2 + 24 + m_Ball->GetScaledSize().x / 2, m_Ball->GetPosition().y});
-            m_Ball->SetVelocity(glm::vec2{-m_Ball->GetVelocity().x, m_Ball->GetVelocity().y});
-        }
-
-        // Collision between m_Vaus and m_Ball
-        if ((m_Vaus->GetAABB().Intersects(m_Ball->GetAABB())) && (!m_ball_Stucked)) {
-            m_Vaus->HandleCollisionWithBall(m_Ball);
+            // Collision between m_Vaus and m_Balls[i]
+            if ((m_Vaus->GetAABB().Intersects(m_Balls[i]->GetAABB())) && (!m_ball_Stucked)) {
+                m_Vaus->HandleCollisionWithBall(m_Balls[i]);
+            }
         }
 
         if (isSpawningPill){
@@ -70,6 +72,13 @@ void App::Update() {
             if (m_Pill->GetAABB().Intersects(m_Vaus->GetAABB())){
                 m_Vaus->HandleCollisionWithPill(m_Pill);
                 pendingPillType = m_Vaus->GetCurrentPill();
+                if (pendingPillType == Pill::PILL_TYPE::PINK){
+                    m_score += 10000;
+                }
+                else{
+                    m_score += 1000;
+                }
+
                 if (pendingPillType == Pill::PILL_TYPE::BLUE || pendingPillType == Pill::PILL_TYPE::RED){
                     shouldReplaceVaus = true;
                 }
@@ -109,6 +118,8 @@ void App::Update() {
         // Delete the out of bound lasers.
         DeleteInactiveLasers();
 
+        DeleteInactiveBall();
+
         CheckForCollision();
 
         WhenPlayerLosesBall();
@@ -116,6 +127,8 @@ void App::Update() {
         DetectGameOver();
 
         VausHoldBall();
+
+        UpdateScoreText();
 
     }
     if (Util::Input::IsKeyUp(Util::Keycode::ESCAPE) ||
@@ -181,7 +194,9 @@ void App::CreatePill(const Pill::PILL_TYPE& pill, const glm::vec2& pos){
 
 void App::VausPowerUp(){
     m_has_Glue = false;
-    m_Ball->SetIsSticky(false);
+    for (auto i = 0; i < m_Balls.size(); i++){
+        m_Balls[i]->SetIsSticky(false);
+    }
     m_ball_Stucked = false;
     glm::vec2 currentPos = m_Vaus->GetPosition();
     for (auto& laser: m_Vaus->GetLasers()){
@@ -212,13 +227,17 @@ void App::OtherPowerUp(){
         case Pill::PILL_TYPE::GREY:
             m_has_Glue = false;
             m_ball_Stucked = false;
-            m_Ball->SetIsSticky(false);
+            for (auto i = 0; i < m_Balls.size(); i++){
+                m_Balls[i]->SetIsSticky(false);
+            }
             m_lives++;
             break;
         case Pill::PILL_TYPE::PINK:
             m_has_Glue = false;
             m_ball_Stucked = false;
-            m_Ball->SetIsSticky(false);
+            for (auto i = 0; i < m_Balls.size(); i++){
+                m_Balls[i]->SetIsSticky(false);
+            }
             m_level++;
             Restart(false);
             InitGame(false);
@@ -226,14 +245,18 @@ void App::OtherPowerUp(){
         case Pill::PILL_TYPE::LIGHTBLUE:
             m_has_Glue = false;
             m_ball_Stucked = false;
-            m_Ball->SetIsSticky(false);
-            std::cout << "LIGHTBLUE" << std::endl;
+            for (auto i = 0; i < m_Balls.size(); i++){
+                m_Balls[i]->SetIsSticky(false);
+            }
+            ActivateDisruption();
             break;
         case Pill::PILL_TYPE::ORANGE:
             m_has_Glue = false;
             m_ball_Stucked = false;
-            m_Ball->SetIsSticky(false);
-            m_Ball->SlowDownSpeed();
+            for (auto i = 0; i < m_Balls.size(); i++){
+                m_Balls[i]->SetIsSticky(false);
+                m_Balls[i]->SlowDownSpeed();
+            }
             break;
     }
 }
@@ -241,14 +264,54 @@ void App::OtherPowerUp(){
 void App::VausHoldBall(){
     if (m_has_Glue){
         m_Vaus->SetImage(RESOURCE_DIR"/Image/Vaus/Normal0.png");
-        if (m_Vaus->GetAABB().Intersects(m_Ball->GetAABB())){
-            m_Ball->SetPosition(glm::vec2{m_Ball->GetPosition().x, m_Vaus->GetPosition().y + m_Vaus->GetScaledSize().y/2 + m_Ball->GetScaledSize().y/2});
-            m_ball_Stucked = true;
-            m_Ball->SetIsSticky(true);
-            m_Ball->SetStickingPosX(abs(m_Ball->GetPosition().x - m_Vaus->GetPosition().x));
+        for (auto i = 0; i < m_Balls.size(); i++){
+            if (m_Vaus->GetAABB().Intersects(m_Balls[i]->GetAABB())){
+                m_Balls[i]->SetPosition(glm::vec2{m_Balls[i]->GetPosition().x, m_Vaus->GetPosition().y + m_Vaus->GetScaledSize().y/2 + m_Balls[i]->GetScaledSize().y/2});
+                m_ball_Stucked = true;
+                m_Balls[i]->SetIsSticky(true);
+                m_Balls[i]->SetStickingPosX(abs(m_Balls[i]->GetPosition().x - m_Vaus->GetPosition().x));
 
+            }
         }
     }
+}
+
+void App::ActivateDisruption(){
+    if (m_Balls.empty()){
+        std::cout << "There is no ball." << std::endl;
+        return;
+    }
+
+    m_Vaus->SetImage(RESOURCE_DIR"/Image/Vaus/Normal0.png");
+    // Assuming m_Ball is the current active ball
+    glm::vec2 currentPos = m_Balls[0]->GetPosition();
+    glm::vec2 currentVel = m_Balls[0]->GetVelocity();
+
+    // Define angles for the new balls
+    float angleOffset = 15.0f; // degrees
+    float speed = glm::length(currentVel);
+
+    // Calculate new velocities
+    glm::vec2 velLeft = RotateVector(currentVel, -angleOffset);
+    glm::vec2 velRight = RotateVector(currentVel, angleOffset);
+
+    // Create new balls
+    auto ballLeft = std::make_shared<Ball>(RESOURCE_DIR"/Image/Ball/ball.png", false, glm::vec2{200,400});
+    ballLeft->SetVelocity(glm::normalize(velLeft) * speed);
+    ballLeft->SetPosition(currentPos);
+    ballLeft->SetVisible(true);
+    m_Root.AddChild(ballLeft);
+
+    auto ballRight = std::make_shared<Ball>(RESOURCE_DIR"/Image/Ball/ball.png", false, glm::vec2{200,400});
+    ballRight->SetVelocity(glm::normalize(velRight) * speed);
+    ballRight->SetPosition(currentPos);
+    ballRight->SetVisible(true);
+    m_Root.AddChild(ballRight);
+
+    // Add new balls to the game
+    m_Balls.push_back(ballLeft);
+    m_Balls.push_back(ballRight);
+    m_active_ball_count += 2;
 }
 
 void App::DeleteInactiveLasers(){
@@ -265,27 +328,44 @@ void App::DeleteInactiveLasers(){
     }
 }
 
-void App::CheckForCollision(){
-    // Find the primary brick that the ball has collided with
-    std::shared_ptr<Brick> collidedBrick = m_LevelManager->PrimaryCollidedBrick(m_Ball);
-    if (collidedBrick) { // If there is a valid collided brick
-        collidedBrick->HandleCollisionWithBall(m_Ball);
-        collidedBrick->OnHit();
-        if (!isSpawningPill && collidedBrick->GetBrickType()!= Brick::BRICK_TYPE::SILVER){
-            Pill::PILL_TYPE spawningPill = collidedBrick->SpawnPill();
-            CreatePill(spawningPill, collidedBrick->GetPosition());
+void App::DeleteInactiveBall(){
+    for (auto it = m_Balls.begin(); it != m_Balls.end();){
+        if ((*it)->IsOutOfBound(m_LevelManager)){
+            (*it)->SetVisible(false);
+            m_Root.RemoveChild(*it);
+            it = m_Balls.erase(it);
+            m_active_ball_count--;
         }
-        if (collidedBrick->IsDestroyed()) {
-            collidedBrick->SetVisible(false);
+        else{
+            ++it;
+        }
+    }
+}
 
-            // Remove the brick from the scene and level
-            m_Root.RemoveChild(std::dynamic_pointer_cast<Util::GameObject>(collidedBrick));
+void App::CheckForCollision(){
+    for (auto i = 0; i < m_Balls.size(); i++){
+        // Find the primary brick that the ball has collided with
+        std::shared_ptr<Brick> collidedBrick = m_LevelManager->PrimaryCollidedBrick(m_Balls[i]);
+        if (collidedBrick) { // If there is a valid collided brick
+            collidedBrick->HandleCollisionWithBall(m_Balls[i]);
+            collidedBrick->OnHit();
+            m_score += collidedBrick->GetPoint();
+            if (!isSpawningPill && collidedBrick->GetBrickType()!= Brick::BRICK_TYPE::SILVER){
+                Pill::PILL_TYPE spawningPill = collidedBrick->SpawnPill();
+                CreatePill(spawningPill, collidedBrick->GetPosition());
+            }
+            if (collidedBrick->IsDestroyed()) {
+                collidedBrick->SetVisible(false);
 
-            // Find and erase the brick from the list
-            auto& bricks = m_LevelManager->GetBricks();
-            auto it = std::find(bricks.begin(), bricks.end(), collidedBrick); // it will be the primary collided brick.
-            if (it != bricks.end()) {
-                bricks.erase(it);
+                // Remove the brick from the scene and level
+                m_Root.RemoveChild(std::dynamic_pointer_cast<Util::GameObject>(collidedBrick));
+
+                // Find and erase the brick from the list
+                auto& bricks = m_LevelManager->GetBricks();
+                auto it = std::find(bricks.begin(), bricks.end(), collidedBrick); // it will be the primary collided brick.
+                if (it != bricks.end()) {
+                    bricks.erase(it);
+                }
             }
         }
     }
@@ -295,6 +375,7 @@ void App::CheckForCollision(){
         for (auto& brick : m_LevelManager->GetBricks()) {
             if (laser->GetAABB().Intersects(brick->GetAABB())) {
                 brick->OnHit(); // damage logic
+                m_score += brick->GetPoint();
                 if (!isSpawningPill && brick->GetBrickType()!= Brick::BRICK_TYPE::SILVER){
                     Pill::PILL_TYPE spawningPill = brick->SpawnPill();
                     CreatePill(spawningPill, brick->GetPosition());
@@ -351,12 +432,14 @@ void App::HandleInput(){
                 m_Vaus->SetPosition({leftBorder, m_Vaus->GetPosition().y});
             }
             if (m_ball_Stucked){
-                if (m_Ball->GetPosition().x > m_Vaus->GetPosition().x){
-                    m_Ball->SetPosition(glm::vec2{m_Vaus->GetPosition().x + m_Ball->GetStickingPosX(), m_Vaus->GetPosition().y + m_Vaus->GetScaledSize().y/2 + m_Ball->GetScaledSize().y/2});
-                }
-                else{
-                    m_Ball->SetPosition(glm::vec2{m_Vaus->GetPosition().x - m_Ball->GetStickingPosX(), m_Vaus->GetPosition().y + m_Vaus->GetScaledSize().y/2 + m_Ball->GetScaledSize().y/2});
+                for (auto i = 0; i < m_Balls.size(); i++){
+                    if (m_Balls[i]->GetPosition().x > m_Vaus->GetPosition().x){
+                        m_Balls[i]->SetPosition(glm::vec2{m_Vaus->GetPosition().x + m_Balls[i]->GetStickingPosX(), m_Vaus->GetPosition().y + m_Vaus->GetScaledSize().y/2 + m_Balls[i]->GetScaledSize().y/2});
+                    }
+                    else{
+                        m_Balls[i]->SetPosition(glm::vec2{m_Vaus->GetPosition().x - m_Balls[i]->GetStickingPosX(), m_Vaus->GetPosition().y + m_Vaus->GetScaledSize().y/2 + m_Balls[i]->GetScaledSize().y/2});
 
+                    }
                 }
             }
         }
@@ -367,19 +450,23 @@ void App::HandleInput(){
                 m_Vaus->SetPosition({rightBorder, m_Vaus->GetPosition().y});
             }
             if (m_ball_Stucked){
-                if (m_Ball->GetPosition().x > m_Vaus->GetPosition().x){
-                    m_Ball->SetPosition(glm::vec2{m_Vaus->GetPosition().x + m_Ball->GetStickingPosX(), m_Vaus->GetPosition().y + m_Vaus->GetScaledSize().y/2 + m_Ball->GetScaledSize().y/2});
-                }
-                else{
-                    m_Ball->SetPosition(glm::vec2{m_Vaus->GetPosition().x - m_Ball->GetStickingPosX(), m_Vaus->GetPosition().y + m_Vaus->GetScaledSize().y/2 + m_Ball->GetScaledSize().y/2});
+                for (auto i = 0; i < m_Balls.size(); i++){
+                    if (m_Balls[i]->GetPosition().x > m_Vaus->GetPosition().x){
+                        m_Balls[i]->SetPosition(glm::vec2{m_Vaus->GetPosition().x + m_Balls[i]->GetStickingPosX(), m_Vaus->GetPosition().y + m_Vaus->GetScaledSize().y/2 + m_Balls[i]->GetScaledSize().y/2});
+                    }
+                    else{
+                        m_Balls[i]->SetPosition(glm::vec2{m_Vaus->GetPosition().x - m_Balls[i]->GetStickingPosX(), m_Vaus->GetPosition().y + m_Vaus->GetScaledSize().y/2 + m_Balls[i]->GetScaledSize().y/2});
 
+                    }
                 }
             }
         }
-        if (m_Ball->IsSticky() && Util::Input::IsKeyPressed(Util::Keycode::SPACE)){
-            m_Vaus->GetVausBallSound()->Play();
-            m_Ball->SetIsSticky(false);
-            m_Vaus->SetStartingState(false);
+        for (auto i = 0; i < m_Balls.size(); i++){
+            if (m_Balls[i]->IsSticky() && Util::Input::IsKeyPressed(Util::Keycode::SPACE)){
+                m_Vaus->GetVausBallSound()->Play();
+                m_Balls[i]->SetIsSticky(false);
+                m_Vaus->SetStartingState(false);
+            }
         }
         // Laser shooting Vaus.
         if (m_Vaus->GetImagePath() == RESOURCE_DIR"/Image/Vaus/Shoot0.png"){
@@ -393,7 +480,9 @@ void App::HandleInput(){
             if ((m_ball_Stucked) && (Util::Input::IsKeyPressed(Util::Keycode::SPACE))){
                 m_Vaus->GetVausBallSound()->Play();
                 m_ball_Stucked = false;
-                m_Ball->SetIsSticky(false);
+                for (auto i = 0; i < m_Balls.size(); i++){
+                    m_Balls[i]->SetIsSticky(false);
+                }
             }
         }
 
@@ -416,8 +505,9 @@ void App::HandleInput(){
 }
 
 void App::WhenPlayerLosesBall(){
-    if ((-(m_Ball->GetPosition().y - m_Ball->GetScaledSize().y / 2) >= m_LevelManager->GetBackgroundImage()->GetScaledSize().y / 2 + 50) && (m_active_ball_count == 1)) {
+    if (m_active_ball_count == 0) {
         m_lives--;
+        m_Balls.clear();
         m_ballOutOfBound = true;
         m_AnnouncementText->ChangeText("You lost the ball.\nOne live is deducted.\nCurrent lives = " + std::to_string(m_lives)+ "\nPress (R) to resume.");
         m_AnnouncementText->SetPosition(glm::vec2{480,200});
@@ -433,9 +523,15 @@ void App::ResumePlayerLosesBall(){
     m_Vaus->SetStartingState(true);
     m_Vaus->SetImage(RESOURCE_DIR"/Image/Vaus/Normal0.png");
 
-    m_Ball->SetVelocity(glm::vec2{200,400});
+    auto m_Ball = std::make_shared<Ball>(RESOURCE_DIR"/Image/Ball/ball.png", true, glm::vec2{200,400});
+    m_Ball->SetZIndex(50);
+    m_Ball->SetVisible(true);
     m_Ball->SetIsSticky(true);
     m_Ball->SetPosition({m_Vaus->GetPosition().x, m_Vaus->GetPosition().y + m_Vaus->GetScaledSize().y/2 + m_Ball->GetScaledSize().y/2});
+    m_Root.AddChild(m_Ball);
+    m_Balls.push_back(m_Ball);
+    m_active_ball_count = 1;
+
     if (isSpawningPill){
         isSpawningPill = false;
         m_Pill->SetVisible(false);
@@ -462,15 +558,15 @@ void App::Restart(bool reset){ // reset is true when the game is resetting from 
     for (auto& brick : m_LevelManager->GetBricks()) {
         m_Root.RemoveChild(brick);
     }
+    for (auto& ball: m_Balls){
+        m_Root.RemoveChild(ball);
+    }
     m_LevelManager->GetBricks().clear();
+    m_Balls.clear();
     // Restarting m_LevelManager
     m_Root.RemoveChild(m_LevelManager->GetChild());
     m_LevelManager->GetChild().reset();
     m_LevelManager.reset();
-
-    m_Root.RemoveChild(m_Ball);
-    m_Ball->SetVisible(false);
-    m_Ball.reset();
 
     // Emptying lasers
     for (auto& laser: m_Vaus->GetLasers()){
@@ -485,6 +581,10 @@ void App::Restart(bool reset){ // reset is true when the game is resetting from 
     m_Root.RemoveChild(m_AnnouncementText);
     m_AnnouncementText->SetVisible(false);
     m_AnnouncementText.reset();
+
+    m_Root.RemoveChild(m_scoreText);
+    m_scoreText->SetVisible(false);
+    m_scoreText.reset();
 
     if (reset){
 
@@ -548,15 +648,36 @@ void App::InitGame(bool reset){
     m_AnnouncementText->SetZIndex(50);
     m_Root.AddChild(m_AnnouncementText);
 
+    // Score texts
+    m_scoreText = std::make_shared<GameText>("Score: \n" + std::to_string(m_score), glm::vec2{-480,100}, 18);
+    m_scoreText->SetVisible(true);
+    m_scoreText->SetZIndex(50);
+    m_Root.AddChild(m_scoreText);
+
     // Ball
-    m_Ball = std::make_shared<Ball>(RESOURCE_DIR"/Image/Ball/ball.png", true, glm::vec2{200,400});
+    auto m_Ball = std::make_shared<Ball>(RESOURCE_DIR"/Image/Ball/ball.png", true, glm::vec2{200,400});
     m_Ball->SetZIndex(50);
     m_Ball->SetPosition({m_Vaus->GetPosition().x, m_Vaus->GetPosition().y + m_Vaus->GetScaledSize().y/2 + m_Ball->GetScaledSize().y/2});
     m_Ball->SetVisible(true);
+    m_Balls.push_back(m_Ball);
     m_Root.AddChild(m_Ball);
 
     m_GameOverSFX = std::make_shared<Util::SFX>(RESOURCE_DIR"/Sounds/GameOver.wav");
 
+}
+
+glm::vec2 App::RotateVector(const glm::vec2& vec, float angle){
+    float radians = glm::radians(angle);
+    float sinA = sin(radians);
+    float cosA = cos(radians);
+    return glm::vec2{
+        vec.x * cosA - vec.y * sinA,
+        vec.x * sinA + vec.y * cosA
+    };
+}
+
+void App::UpdateScoreText(){
+    m_scoreText->ChangeText("Score: \n" + std::to_string(m_score));
 }
 
 

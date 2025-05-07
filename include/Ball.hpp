@@ -6,7 +6,7 @@
 #define BALL_HPP
 
 #include "Entity.hpp"
-#include "LevelManager.hpp"
+class LevelManager;
 
 class Ball : public Entity{
 private:

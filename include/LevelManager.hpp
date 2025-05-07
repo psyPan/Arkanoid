@@ -9,7 +9,6 @@
 #include "Brick.hpp"
 #include "Util/Renderer.hpp"
 
-
 class LevelManager{
 private:
     std::shared_ptr<BackgroundImage> m_backgroundImage;
