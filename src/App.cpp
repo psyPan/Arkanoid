@@ -350,7 +350,7 @@ void App::CheckForCollision(){
             collidedBrick->HandleCollisionWithBall(m_Balls[i]);
             collidedBrick->OnHit();
             m_score += collidedBrick->GetPoint();
-            if (!isSpawningPill && collidedBrick->GetBrickType()!= Brick::BRICK_TYPE::SILVER){
+            if (!isSpawningPill && collidedBrick->GetBrickType()!= Brick::BRICK_TYPE::SILVER && collidedBrick->GetBrickType()!= Brick::BRICK_TYPE::GOLD){
                 Pill::PILL_TYPE spawningPill = collidedBrick->SpawnPill();
                 CreatePill(spawningPill, collidedBrick->GetPosition());
             }

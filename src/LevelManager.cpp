@@ -89,7 +89,7 @@ LevelManager::LevelManager(int level) : m_level(level){
             break;
         case 2:
             m_layout = Level2_layout;
-            m_startPos.x = (m_backgroundImage->GetScaledSize().x / 2) + 48;
+            m_startPos.x = 0 - (m_backgroundImage->GetScaledSize().x / 2) + 48;
             m_startPos.y = (m_backgroundImage->GetScaledSize().y / 2 - 24) - ((m_backgroundImage->GetScaledSize().y - 24) / 5) + 80;
             break;
         default:
@@ -124,7 +124,7 @@ void LevelManager::CreateBrick(Util::Renderer& m_Root){
                 SetupBricks(imagePath, Brick::BRICK_TYPE::SILVER, m_bricks, m_Root, m_startPos, i, j, 2, 0);
             }
             else if (m_layout[i][j] == Brick::BRICK_TYPE::GOLD){
-                std::string imagePath = RESOURCE_DIR"/Image/Brick/Yellow.png";
+                std::string imagePath = RESOURCE_DIR"/Image/Brick/Gold.png";
                 SetupBricks(imagePath, Brick::BRICK_TYPE::GOLD, m_bricks, m_Root, m_startPos, i, j, std::numeric_limits<int>::max(), 0);
             }
             else if (m_layout[i][j] == Brick::BRICK_TYPE::RED){
