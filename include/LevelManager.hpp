@@ -8,6 +8,7 @@
 #include "BackgroundImage.hpp"
 #include "Brick.hpp"
 #include "Util/Renderer.hpp"
+#include <limits>
 
 class LevelManager{
 private:
@@ -34,6 +35,7 @@ public:
     }
     static std::vector<std::vector<Brick::BRICK_TYPE>> Level0_layout;
     static std::vector<std::vector<Brick::BRICK_TYPE>> Level1_layout;
+    static std::vector<std::vector<Brick::BRICK_TYPE>> Level2_layout;
     void CreateBrick(Util::Renderer& m_Root);
 
     std::vector<std::shared_ptr<Brick>>& GetBricks(){

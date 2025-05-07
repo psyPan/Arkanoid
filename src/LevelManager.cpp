@@ -28,6 +28,39 @@ std::vector<std::vector<Brick::BRICK_TYPE>> LevelManager::Level1_layout =
     {Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::RED}
     };
 
+std::vector<std::vector<Brick::BRICK_TYPE>> LevelManager::Level2_layout = {
+    std::vector<Brick::BRICK_TYPE>(13, Brick::BRICK_TYPE::GREEN),
+    std::vector<Brick::BRICK_TYPE>(13, Brick::BRICK_TYPE::NULL_BRICK),
+
+    {Brick::BRICK_TYPE::WHITE, Brick::BRICK_TYPE::WHITE, Brick::BRICK_TYPE::WHITE,
+     Brick::BRICK_TYPE::GOLD, Brick::BRICK_TYPE::GOLD, Brick::BRICK_TYPE::GOLD, Brick::BRICK_TYPE::GOLD, Brick::BRICK_TYPE::GOLD,
+     Brick::BRICK_TYPE::GOLD, Brick::BRICK_TYPE::GOLD, Brick::BRICK_TYPE::GOLD, Brick::BRICK_TYPE::GOLD, Brick::BRICK_TYPE::GOLD},
+
+    std::vector<Brick::BRICK_TYPE>(13, Brick::BRICK_TYPE::NULL_BRICK),
+    std::vector<Brick::BRICK_TYPE>(13, Brick::BRICK_TYPE::RED),
+    std::vector<Brick::BRICK_TYPE>(13, Brick::BRICK_TYPE::NULL_BRICK),
+
+    {Brick::BRICK_TYPE::GOLD, Brick::BRICK_TYPE::GOLD, Brick::BRICK_TYPE::GOLD, Brick::BRICK_TYPE::GOLD, Brick::BRICK_TYPE::GOLD,
+     Brick::BRICK_TYPE::GOLD, Brick::BRICK_TYPE::GOLD, Brick::BRICK_TYPE::GOLD, Brick::BRICK_TYPE::GOLD, Brick::BRICK_TYPE::GOLD,
+     Brick::BRICK_TYPE::WHITE, Brick::BRICK_TYPE::WHITE, Brick::BRICK_TYPE::WHITE},
+
+    std::vector<Brick::BRICK_TYPE>(13, Brick::BRICK_TYPE::NULL_BRICK),
+    std::vector<Brick::BRICK_TYPE>(13, Brick::BRICK_TYPE::PINK),
+    std::vector<Brick::BRICK_TYPE>(13, Brick::BRICK_TYPE::NULL_BRICK),
+
+    {Brick::BRICK_TYPE::BLUE, Brick::BRICK_TYPE::BLUE, Brick::BRICK_TYPE::BLUE,
+     Brick::BRICK_TYPE::GOLD, Brick::BRICK_TYPE::GOLD, Brick::BRICK_TYPE::GOLD, Brick::BRICK_TYPE::GOLD, Brick::BRICK_TYPE::GOLD,
+     Brick::BRICK_TYPE::GOLD, Brick::BRICK_TYPE::GOLD, Brick::BRICK_TYPE::GOLD, Brick::BRICK_TYPE::GOLD, Brick::BRICK_TYPE::GOLD},
+
+    std::vector<Brick::BRICK_TYPE>(13, Brick::BRICK_TYPE::NULL_BRICK),
+    std::vector<Brick::BRICK_TYPE>(13, Brick::BRICK_TYPE::LIGHT_BLUE),
+    std::vector<Brick::BRICK_TYPE>(13, Brick::BRICK_TYPE::NULL_BRICK),
+
+    {Brick::BRICK_TYPE::GOLD, Brick::BRICK_TYPE::GOLD, Brick::BRICK_TYPE::GOLD, Brick::BRICK_TYPE::GOLD, Brick::BRICK_TYPE::GOLD,
+     Brick::BRICK_TYPE::GOLD, Brick::BRICK_TYPE::GOLD, Brick::BRICK_TYPE::GOLD, Brick::BRICK_TYPE::GOLD, Brick::BRICK_TYPE::GOLD,
+     Brick::BRICK_TYPE::LIGHT_BLUE, Brick::BRICK_TYPE::LIGHT_BLUE, Brick::BRICK_TYPE::LIGHT_BLUE}
+};
+
 void SetupBricks(const std::string& path, Brick::BRICK_TYPE brickType, std::vector<std::shared_ptr<Brick>>& m_bricks, Util::Renderer& m_Root,const glm::vec2& start_pos, int i, int j, int hitCount, int point){
     std::shared_ptr<Brick> brick = std::make_shared<Brick>(path, brickType, point);
     glm::vec2 update_pos = glm::vec2{start_pos.x + j * brick->GetScaledSize().x, start_pos.y - i * brick->GetScaledSize().y};
@@ -53,6 +86,11 @@ LevelManager::LevelManager(int level) : m_level(level){
             m_layout = Level1_layout;
             m_startPos.x = 0 - (m_backgroundImage->GetScaledSize().x / 2) + 48;
             m_startPos.y = (m_backgroundImage->GetScaledSize().y / 2 - 24) - ((m_backgroundImage->GetScaledSize().y - 24) / 5) + 65;
+            break;
+        case 2:
+            m_layout = Level2_layout;
+            m_startPos.x = (m_backgroundImage->GetScaledSize().x / 2) + 48;
+            m_startPos.y = (m_backgroundImage->GetScaledSize().y / 2 - 24) - ((m_backgroundImage->GetScaledSize().y - 24) / 5) + 80;
             break;
         default:
             m_layout = Level0_layout;
@@ -86,8 +124,8 @@ void LevelManager::CreateBrick(Util::Renderer& m_Root){
                 SetupBricks(imagePath, Brick::BRICK_TYPE::SILVER, m_bricks, m_Root, m_startPos, i, j, 2, 0);
             }
             else if (m_layout[i][j] == Brick::BRICK_TYPE::GOLD){
-                std::shared_ptr<Brick> brick = std::make_shared<Brick>(RESOURCE_DIR"/Image/Brick/Gold.png", Brick::BRICK_TYPE::GOLD, 0);
-                m_bricks.push_back(brick);
+                std::string imagePath = RESOURCE_DIR"/Image/Brick/Yellow.png";
+                SetupBricks(imagePath, Brick::BRICK_TYPE::GOLD, m_bricks, m_Root, m_startPos, i, j, std::numeric_limits<int>::max(), 0);
             }
             else if (m_layout[i][j] == Brick::BRICK_TYPE::RED){
                 std::string imagePath = RESOURCE_DIR"/Image/Brick/Red.png";
