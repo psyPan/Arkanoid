@@ -349,7 +349,13 @@ void App::CheckForCollision(){
         if (collidedBrick) { // If there is a valid collided brick
             collidedBrick->HandleCollisionWithBall(m_Balls[i]);
             collidedBrick->OnHit();
-            m_score += collidedBrick->GetPoint();
+            if (collidedBrick->IsDestroyed()){
+                m_score += collidedBrick->GetPoint();
+            }
+            if (m_score >= m_lastLifeScoreMilestone + 10000) {
+                m_lives++;  // Only adds 1 life
+                m_lastLifeScoreMilestone += 10000;
+            }
             if (!isSpawningPill && collidedBrick->GetBrickType()!= Brick::BRICK_TYPE::SILVER && collidedBrick->GetBrickType()!= Brick::BRICK_TYPE::GOLD){
                 Pill::PILL_TYPE spawningPill = collidedBrick->SpawnPill();
                 CreatePill(spawningPill, collidedBrick->GetPosition());
@@ -608,7 +614,7 @@ void App::InitGame(bool reset){
     if (reset){
         LOG_TRACE("Start");
         m_lives = 3;
-        m_level = 2;
+        m_level = 5;
         m_gameIsRunning = true;
         m_gameOver = false;
         m_CurrentState = State::UPDATE;

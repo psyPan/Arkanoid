@@ -111,6 +111,7 @@ private:
     std::shared_ptr<Util::SFX> m_GameOverSFX;
 
     int m_score = 0;
+    int m_lastLifeScoreMilestone = 0;
     std::shared_ptr<GameText> m_scoreText;
 };
 
