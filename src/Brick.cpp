@@ -12,91 +12,51 @@ Brick::Brick(const std::string& ImagePath,Brick::BRICK_TYPE brickType, int point
 
 }
 
-// const float MAX_BOUNCE_ANGLE = M_PI / 2.0; // 60 degrees
-// void Brick::HandleCollisionWithBall(const std::shared_ptr<Ball>& ball){
-//     m_BrickBallSound->Play();
-//     glm::vec2 ballVel = ball->GetVelocity();
-//     float relativeIntersectX = 0.0f;
-//     if (ballVel.y > 0){
-//         relativeIntersectX = (GetPosition().x - ball->GetPosition().x) / GetScaledSize().x;
-//     }
-//     else if (ballVel.y < 0){
-//         relativeIntersectX = (ball->GetPosition().x - GetPosition().x) / GetScaledSize().x;
-//     }
-//     std::cout << "relativeIntersectX = " << relativeIntersectX << std::endl;
-//     float bounceAngle = relativeIntersectX * MAX_BOUNCE_ANGLE;
-//     // Adjust angle
-//     if (bounceAngle < 0 && bounceAngle > -0.7){
-//         bounceAngle = -0.7;
-//     }
-//     if (bounceAngle > 0 && bounceAngle < 0.7){
-//         bounceAngle = 0.7;
-//     }
-//     bounceAngle = std::max(-1.5f, std::min(1.5f, relativeIntersectX));
-//     std::cout << "bounceAngle = " << bounceAngle << std::endl;
-//     // Increase speed a little
-//     float current_speed = glm::length(ball->GetVelocity());
-//     glm::vec2 newVelocity;
-//     // Calculate the new velocity components
-//     if (ballVel.y > 0){
-//         if (ballVel.x > 0){
-//             newVelocity.x = - current_speed * std::sin(bounceAngle);
-//             newVelocity.x = - newVelocity.x;
-//         }
-//         else if (ballVel.x < 0){
-//             newVelocity.x = current_speed * std::sin(bounceAngle);
-//             newVelocity.x = - newVelocity.x;
-//         }
-//         newVelocity.y = - current_speed * std::cos(bounceAngle);
-//     }
-//     else if (ballVel.y < 0){
-//         if (ballVel.x > 0){
-//             newVelocity.x = - current_speed * std::sin(bounceAngle);
-//             newVelocity.x = - newVelocity.x;
-//         }
-//         else if (ballVel.x < 0){
-//             newVelocity.x = current_speed * std::sin(bounceAngle);
-//             newVelocity.x = - newVelocity.x;
-//         }
-//         newVelocity.y =  current_speed * std::cos(bounceAngle);
-//     }
-//     ball->SetVelocity(newVelocity);
-// }
-
-// new version
-const float MAX_BOUNCE_ANGLE = glm::radians(60.0f); // 60 degrees in radians
-
 void Brick::HandleCollisionWithBall(const std::shared_ptr<Ball>& ball) {
     m_BrickBallSound->Play();
+
     glm::vec2 ballVel = ball->GetVelocity();
-
-    float relativeIntersectX = 0.0f;
-    if (ballVel.y > 0) {
-        relativeIntersectX = (GetPosition().x - ball->GetPosition().x) / GetScaledSize().x;
-    } else if (ballVel.y < 0) {
-        relativeIntersectX = (ball->GetPosition().x - GetPosition().x) / GetScaledSize().x;
-    }
-
-    // Clamp relativeIntersectX to [-1, 1] to avoid overflows
-    relativeIntersectX = std::max(-1.0f, std::min(1.0f, relativeIntersectX));
-
-    float bounceAngle = relativeIntersectX * MAX_BOUNCE_ANGLE;
-
-    // Ensure minimum bounce angle (avoid too vertical bounce)
-    if (std::abs(bounceAngle) < glm::radians(30.0f)) {
-        bounceAngle = glm::radians(30.0f) * (bounceAngle < 0 ? -1.0f : 1.0f);
-    }
-
+    glm::vec2 ballDirection = glm::normalize(ballVel); // unit vector of ballVel
     float speed = glm::length(ballVel);
-    glm::vec2 newVelocity;
+    glm::vec2 newVelocity = glm::vec2{0,0};
 
-    // Direction: based on original vertical direction
-    float ySign = (ballVel.y > 0) ? -1.0f : 1.0f;
-    float xSign = (ballVel.x > 0) ? -1.0f : 1.0f;
+    glm::vec2 diff = ball->GetPosition() - GetPosition();
+    float overlapX = (ball->GetScaledSize().x + GetScaledSize().x) / 2.0f - std::abs(diff.x);
+    float overlapY = (ball->GetScaledSize().y + GetScaledSize().y) / 2.0f - std::abs(diff.y);
 
-    newVelocity.x = speed * std::sin(bounceAngle) * xSign;
-    newVelocity.y = speed * std::cos(bounceAngle) * ySign;
+    if (overlapX > overlapY) { // Hitting the horizontal plane of brick
+        glm::vec2 newPos = ball->GetPosition();
+        newPos.y += (diff.y > 0 ? 1 : -1) * overlapY;
+        ball->SetPosition(newPos);
+        if (diff.y < 0) {
+            glm::vec2 normalVector = glm::vec2{0,-1};
+            float dot_product = glm::dot(ballDirection, normalVector);
+            glm::vec2 reflectionVector = ballDirection - 2 * dot_product * normalVector;
+            newVelocity = reflectionVector * speed;
 
+        } else {
+            glm::vec2 normalVector = glm::vec2{0,1};
+            float dot_product = glm::dot(ballDirection, normalVector);
+            glm::vec2 reflectionVector = ballDirection - 2 * dot_product * normalVector;
+            newVelocity = reflectionVector * speed;
+        }
+    } else {
+        glm::vec2 newPos = ball->GetPosition();
+        newPos.x += (diff.x > 0 ? 1 : -1) * overlapX;
+        ball->SetPosition(newPos);
+        if (diff.x > 0) {
+            glm::vec2 normalVector = glm::vec2{1,0};
+            float dot_product = glm::dot(ballDirection, normalVector);
+            glm::vec2 reflectionVector = ballDirection - 2 * dot_product * normalVector;
+            newVelocity = reflectionVector * speed;
+        } else {
+            std::cout << "Hit from left\n";
+            glm::vec2 normalVector = glm::vec2{-1,0};
+            float dot_product = glm::dot(ballDirection, normalVector);
+            glm::vec2 reflectionVector = ballDirection - 2 * dot_product * normalVector;
+            newVelocity = reflectionVector * speed;
+        }
+    }
     ball->SetVelocity(newVelocity);
 }
 

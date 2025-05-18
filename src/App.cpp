@@ -382,7 +382,7 @@ void App::CheckForCollision(){
             if (laser->GetAABB().Intersects(brick->GetAABB())) {
                 brick->OnHit(); // damage logic
                 m_score += brick->GetPoint();
-                if (!isSpawningPill && brick->GetBrickType()!= Brick::BRICK_TYPE::SILVER){
+                if (!isSpawningPill && brick->GetBrickType()!= Brick::BRICK_TYPE::SILVER && brick->GetBrickType()!= Brick::BRICK_TYPE::GOLD){
                     Pill::PILL_TYPE spawningPill = brick->SpawnPill();
                     CreatePill(spawningPill, brick->GetPosition());
                 }
@@ -614,7 +614,7 @@ void App::InitGame(bool reset){
     if (reset){
         LOG_TRACE("Start");
         m_lives = 3;
-        m_level = 6;
+        m_level = 2;
         m_gameIsRunning = true;
         m_gameOver = false;
         m_CurrentState = State::UPDATE;
