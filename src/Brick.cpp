@@ -5,19 +5,25 @@
 
 #include <iostream>
 #include <random>
+
+void ReflectVector(const glm::vec2& ballVel, const glm::vec2& normalVector, glm::vec2& newVelocity){
+    glm::vec2 ballDirection = glm::normalize(ballVel);
+    float speed = glm::length(ballVel);
+    float dot_product = glm::dot(ballDirection, normalVector);
+    glm::vec2 reflectionVector = ballDirection - 2 * dot_product * normalVector; // law of reflection formula
+    newVelocity = reflectionVector * speed;
+}
+
 Brick::Brick(const std::string& ImagePath,Brick::BRICK_TYPE brickType, int point) : Entity(ImagePath), m_brickType(brickType), m_point(point) {
     SetVisible(true);
     SetZIndex(50);
     m_BrickBallSound = std::make_shared<Util::SFX>(RESOURCE_DIR"/Sounds/Brick_Ball_Touched.wav");
-
 }
 
 void Brick::HandleCollisionWithBall(const std::shared_ptr<Ball>& ball) {
     m_BrickBallSound->Play();
 
     glm::vec2 ballVel = ball->GetVelocity();
-    glm::vec2 ballDirection = glm::normalize(ballVel); // unit vector of ballVel
-    float speed = glm::length(ballVel);
     glm::vec2 newVelocity = glm::vec2{0,0};
 
     glm::vec2 diff = ball->GetPosition() - GetPosition();
@@ -30,15 +36,11 @@ void Brick::HandleCollisionWithBall(const std::shared_ptr<Ball>& ball) {
         ball->SetPosition(newPos);
         if (diff.y < 0) {
             glm::vec2 normalVector = glm::vec2{0,-1};
-            float dot_product = glm::dot(ballDirection, normalVector);
-            glm::vec2 reflectionVector = ballDirection - 2 * dot_product * normalVector;
-            newVelocity = reflectionVector * speed;
+            ReflectVector(ballVel, normalVector, newVelocity);
 
         } else {
             glm::vec2 normalVector = glm::vec2{0,1};
-            float dot_product = glm::dot(ballDirection, normalVector);
-            glm::vec2 reflectionVector = ballDirection - 2 * dot_product * normalVector;
-            newVelocity = reflectionVector * speed;
+            ReflectVector(ballVel, normalVector, newVelocity);
         }
     } else {
         glm::vec2 newPos = ball->GetPosition();
@@ -46,15 +48,10 @@ void Brick::HandleCollisionWithBall(const std::shared_ptr<Ball>& ball) {
         ball->SetPosition(newPos);
         if (diff.x > 0) {
             glm::vec2 normalVector = glm::vec2{1,0};
-            float dot_product = glm::dot(ballDirection, normalVector);
-            glm::vec2 reflectionVector = ballDirection - 2 * dot_product * normalVector;
-            newVelocity = reflectionVector * speed;
+            ReflectVector(ballVel, normalVector, newVelocity);
         } else {
-            std::cout << "Hit from left\n";
             glm::vec2 normalVector = glm::vec2{-1,0};
-            float dot_product = glm::dot(ballDirection, normalVector);
-            glm::vec2 reflectionVector = ballDirection - 2 * dot_product * normalVector;
-            newVelocity = reflectionVector * speed;
+            ReflectVector(ballVel, normalVector, newVelocity);
         }
     }
     ball->SetVelocity(newVelocity);

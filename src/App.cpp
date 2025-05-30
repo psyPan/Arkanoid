@@ -19,10 +19,15 @@ void App::Update() {
         //TODO: do your things here and delete this line <3
         UpdateLivesUI();
 
-        if (m_LevelManager->GetBricks().empty()){
+        if (m_LevelManager->GetBricks().empty() || AllBrickIsGold()){
             m_level++;
             Restart(false);
             InitGame(false);
+        }
+
+        if (m_score >= m_lastLifeScoreMilestone + 10000) {
+            m_lives++;  // Only adds 1 life
+            m_lastLifeScoreMilestone += 10000;
         }
 
         for (auto i = 0; i < m_Balls.size(); i++){
@@ -52,7 +57,9 @@ void App::Update() {
             if (m_Balls[i]->GetPosition().y + m_Balls[i]->GetScaledSize().y / 2 > (m_LevelManager->GetBackgroundImage()->GetScaledSize().y / 2 - 24)){
                 m_Balls[i]->SetPosition({m_Balls[i]->GetPosition().x, m_LevelManager->GetBackgroundImage()->GetScaledSize().y / 2 - 24 - m_Balls[i]->GetScaledSize().y / 2});
                 m_Balls[i]->SetVelocity(glm::vec2{m_Balls[i]->GetVelocity().x, -m_Balls[i]->GetVelocity().y});
-                m_Balls[i]->MaximizeSpeed();
+                if (m_level != 9){
+                    m_Balls[i]->MaximizeSpeed();
+                }
             }
             // Left border
             if (m_Balls[i]->GetPosition().x - m_Balls[i]->GetScaledSize().x / 2 < -(m_LevelManager->GetBackgroundImage()->GetScaledSize().x / 2 - 24)){
@@ -352,10 +359,6 @@ void App::CheckForCollision(){
             if (collidedBrick->IsDestroyed()){
                 m_score += collidedBrick->GetPoint();
             }
-            if (m_score >= m_lastLifeScoreMilestone + 10000) {
-                m_lives++;  // Only adds 1 life
-                m_lastLifeScoreMilestone += 10000;
-            }
             if (!isSpawningPill && collidedBrick->GetBrickType()!= Brick::BRICK_TYPE::SILVER && collidedBrick->GetBrickType()!= Brick::BRICK_TYPE::GOLD){
                 Pill::PILL_TYPE spawningPill = collidedBrick->SpawnPill();
                 CreatePill(spawningPill, collidedBrick->GetPosition());
@@ -614,7 +617,7 @@ void App::InitGame(bool reset){
     if (reset){
         LOG_TRACE("Start");
         m_lives = 3;
-        m_level = 2;
+        m_level = 15;
         m_gameIsRunning = true;
         m_gameOver = false;
         m_CurrentState = State::UPDATE;
@@ -684,6 +687,16 @@ glm::vec2 App::RotateVector(const glm::vec2& vec, float angle){
 
 void App::UpdateScoreText(){
     m_scoreText->ChangeText("Score: \n" + std::to_string(m_score));
+}
+
+bool App::AllBrickIsGold(){
+    int counter = 0;
+    for (auto& brick: m_LevelManager->GetBricks()){
+        if (brick->GetBrickType() == Brick::BRICK_TYPE::GOLD){
+            counter++;
+        }
+    }
+    return counter == m_LevelManager->GetBricks().size();
 }
 
 

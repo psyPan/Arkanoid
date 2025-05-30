@@ -66,6 +66,8 @@ public:
 
     void UpdateScoreText();
 
+    bool AllBrickIsGold();
+
 private:
     void ValidTask();
 
