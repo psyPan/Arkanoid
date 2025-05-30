@@ -104,7 +104,7 @@ private:
     bool m_ball_Stucked;
 
     std::vector<std::shared_ptr<Brick>> bricksToRemove;
-    int m_level;
+    int m_level = 0;
     bool m_gameIsRunning;
     bool m_gameOver;
     bool m_ballOutOfBound;

@@ -49,6 +49,11 @@ public:
     static std::vector<std::vector<Brick::BRICK_TYPE>> Level13_layout;
     static std::vector<std::vector<Brick::BRICK_TYPE>> Level14_layout;
     static std::vector<std::vector<Brick::BRICK_TYPE>> Level15_layout;
+    static std::vector<std::vector<Brick::BRICK_TYPE>> Level16_layout;
+    static std::vector<std::vector<Brick::BRICK_TYPE>> Level17_layout;
+    static std::vector<std::vector<Brick::BRICK_TYPE>> Level18_layout;
+    static std::vector<std::vector<Brick::BRICK_TYPE>> Level19_layout;
+    static std::vector<std::vector<Brick::BRICK_TYPE>> Level20_layout;
 
 
 
