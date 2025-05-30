@@ -54,8 +54,9 @@ public:
     static std::vector<std::vector<Brick::BRICK_TYPE>> Level18_layout;
     static std::vector<std::vector<Brick::BRICK_TYPE>> Level19_layout;
     static std::vector<std::vector<Brick::BRICK_TYPE>> Level20_layout;
-
-
+    static std::vector<std::vector<Brick::BRICK_TYPE>> Level21_layout;
+    static std::vector<std::vector<Brick::BRICK_TYPE>> Level22_layout;
+    static std::vector<std::vector<Brick::BRICK_TYPE>> Level23_layout;
 
     void CreateBrick(Util::Renderer& m_Root);
 
