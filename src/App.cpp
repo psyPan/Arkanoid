@@ -617,7 +617,7 @@ void App::InitGame(bool reset){
     if (reset){
         LOG_TRACE("Start");
         m_lives = 3;
-        m_level = 28;
+        m_level = 31;
         m_gameIsRunning = true;
         m_gameOver = false;
         m_CurrentState = State::UPDATE;
