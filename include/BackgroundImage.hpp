@@ -17,6 +17,11 @@ public:
         temp->SetImage(RESOURCE_DIR"/Image/Background/level" + std::to_string(m_level % 3) + ".png");
     }
 
+    void SetFinalBackgroundImage(){
+        auto temp = std::dynamic_pointer_cast<Util::Image>(m_Drawable);
+        temp->SetImage(RESOURCE_DIR"/Image/Background/final.png");
+    }
+
 
 private:
     int m_level;

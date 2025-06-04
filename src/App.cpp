@@ -20,9 +20,11 @@ void App::Update() {
         UpdateLivesUI();
 
         if (m_LevelManager->GetBricks().empty() || AllBrickIsGold()){
-            m_level++;
-            Restart(false);
-            InitGame(false);
+            if (m_level != 32){
+                m_level++;
+                Restart(false);
+                InitGame(false);
+            }
         }
 
         if (m_score >= m_lastLifeScoreMilestone + 10000) {
@@ -435,6 +437,7 @@ void App::HandleInput(){
         // Movement of Vaus
         if (Util::Input::IsKeyPressed(Util::Keycode::A)){
             m_Vaus->SetPosition({m_Vaus->GetPosition().x - 10, m_Vaus->GetPosition().y});
+
             float leftBorder = -((m_LevelManager->GetBackgroundImage()->GetScaledSize().x / 2 - 24) - m_Vaus->GetScaledSize().x / 2);
             // 24 is the white border bar width
             if (m_Vaus->GetPosition().x < leftBorder){
@@ -670,6 +673,14 @@ void App::InitGame(bool reset){
     m_Ball->SetVisible(true);
     m_Balls.push_back(m_Ball);
     m_Root.AddChild(m_Ball);
+
+    if (m_level == 32){
+        m_DOH_Frame = std::make_shared<Entity>(RESOURCE_DIR"/Image/Background/DOH_Frame.png");
+        m_DOH_Frame->SetZIndex(30);
+        m_DOH_Frame->SetPosition(glm::vec2{12,107});
+        m_DOH_Frame->SetVisible(true);
+        m_Root.AddChild(m_DOH_Frame);
+    }
 
     m_GameOverSFX = std::make_shared<Util::SFX>(RESOURCE_DIR"/Sounds/GameOver.wav");
 

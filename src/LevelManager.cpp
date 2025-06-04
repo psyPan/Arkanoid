@@ -499,6 +499,11 @@ std::vector<std::vector<Brick::BRICK_TYPE>> LevelManager::Level31_layout = {
     {Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::NULL_BRICK,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER,Brick::BRICK_TYPE::SILVER},
 };
 
+std::vector<std::vector<Brick::BRICK_TYPE>> LevelManager::Level32_layout = {
+    std::vector(13, Brick::BRICK_TYPE::NULL_BRICK)
+};
+
+
 
 void SetupBricks(const std::string& path, Brick::BRICK_TYPE brickType, std::vector<std::shared_ptr<Brick>>& m_bricks, Util::Renderer& m_Root,const glm::vec2& start_pos, int i, int j, int hitCount, int point){
     std::shared_ptr<Brick> brick = std::make_shared<Brick>(path, brickType, point);
@@ -512,7 +517,13 @@ void SetupBricks(const std::string& path, Brick::BRICK_TYPE brickType, std::vect
 
 LevelManager::LevelManager(int level) : m_level(level){
     m_backgroundImage = std::make_shared<BackgroundImage>(m_level);
-    m_backgroundImage->SetBackGroundImage();
+    if (level == 32){
+        m_backgroundImage->SetFinalBackgroundImage();
+    }
+    else{
+        m_backgroundImage->SetBackGroundImage();
+
+    }
     SetLevelLayout();
 }
 
@@ -675,6 +686,11 @@ void LevelManager::SetLevelLayout(){
             break;
         case 31:
             m_layout = Level31_layout;
+            m_startPos.x = 0 - (m_backgroundImage->GetScaledSize().x / 2) + 48;
+            m_startPos.y = (m_backgroundImage->GetScaledSize().y / 2 - 24) - ((m_backgroundImage->GetScaledSize().y - 24) / 5) + 40;
+            break;
+        case 32:
+            m_layout = Level32_layout;
             m_startPos.x = 0 - (m_backgroundImage->GetScaledSize().x / 2) + 48;
             m_startPos.y = (m_backgroundImage->GetScaledSize().y / 2 - 24) - ((m_backgroundImage->GetScaledSize().y - 24) / 5) + 40;
             break;

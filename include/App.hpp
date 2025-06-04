@@ -83,6 +83,8 @@ private:
     // Character
     std::shared_ptr<Character> m_Vaus;
     std::vector<std::shared_ptr<Ball>> m_Balls;
+    std::shared_ptr<Character> m_DOH;
+    std::shared_ptr<Entity> m_DOH_Frame;
     int m_active_ball_count;
 
     // Player lives display icon
