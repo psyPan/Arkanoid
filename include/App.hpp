@@ -3,6 +3,7 @@
 
 #include "Ball.hpp"
 #include "Character.hpp"
+#include "DOH.hpp"
 #include "LevelManager.hpp"
 #include "pch.hpp" // IWYU pragma: export
 #include "Util/Renderer.hpp"
@@ -68,6 +69,8 @@ public:
 
     bool AllBrickIsGold();
 
+    void DOH_FiringLasers();
+
 private:
     void ValidTask();
 
@@ -83,9 +86,16 @@ private:
     // Character
     std::shared_ptr<Character> m_Vaus;
     std::vector<std::shared_ptr<Ball>> m_Balls;
-    std::shared_ptr<Character> m_DOH;
-    std::shared_ptr<Entity> m_DOH_Frame;
     int m_active_ball_count;
+
+    std::shared_ptr<DOH> m_DOH;
+    std::shared_ptr<Entity> m_DOH_Frame;
+
+    int m_DOH_laser_counter = 0;
+    double m_DOH_last_laser_time = 0.0;
+    double m_DOH_last_laser_set_time = 0.0;
+    bool m_DOH_is_firing = true;
+    bool m_Vaus_get_hit = false;
 
     // Player lives display icon
     std::shared_ptr<Entity> m_Icon;

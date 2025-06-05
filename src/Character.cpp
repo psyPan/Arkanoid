@@ -9,6 +9,7 @@
 
 
 Character::Character(const std::string& ImagePath) {
+    m_Lasers.clear();
     SetImage(ImagePath);
     ResetPosition();
     lastFireTime = 0.0f;
@@ -89,8 +90,8 @@ void Character::HandleCollisionWithPill(const std::shared_ptr<Pill>& pill){
 
 void Character::FireLaser(double currentTime, Util::Renderer& m_Root){
     if (currentTime - lastFireTime >= 150){
-        std::shared_ptr<Laser> laser1 = std::make_shared<Laser>(RESOURCE_DIR"/Image/Laser/Laser.png", glm::vec2{GetPosition().x - GetScaledSize().x/4, GetPosition().y + GetScaledSize().y/2}, 10);
-        std::shared_ptr<Laser> laser2 = std::make_shared<Laser>(RESOURCE_DIR"/Image/Laser/Laser.png", glm::vec2{GetPosition().x + GetScaledSize().x/4, GetPosition().y + GetScaledSize().y/2}, 10);
+        std::shared_ptr<Laser> laser1 = std::make_shared<Laser>(RESOURCE_DIR"/Image/Laser/Laser.png", glm::vec2{GetPosition().x - GetScaledSize().x/4, GetPosition().y + GetScaledSize().y/2}, 10, 1);
+        std::shared_ptr<Laser> laser2 = std::make_shared<Laser>(RESOURCE_DIR"/Image/Laser/Laser.png", glm::vec2{GetPosition().x + GetScaledSize().x/4, GetPosition().y + GetScaledSize().y/2}, 10, 1);
         laser1->SetVisible(true);
         laser1->SetZIndex(50);
         laser2->SetVisible(true);
@@ -103,4 +104,6 @@ void Character::FireLaser(double currentTime, Util::Renderer& m_Root){
         m_LaserSound->Play();
     }
 }
+
+
 

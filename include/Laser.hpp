@@ -8,8 +8,11 @@
 
 class Laser: public Entity{
 public:
-    explicit Laser(const std::string& imagePath, const glm::vec2& pos, float speed);
+    explicit Laser(const std::string& imagePath, const glm::vec2& pos, float speed, int trajectory);
+
     void Update(const glm::vec2& screenSize);
+
+    void SetDirection(const glm::vec2& direction){ m_direction_unit_vector = direction; };
     bool IsActive() const{
         return active;
     };
@@ -19,6 +22,8 @@ public:
 private:
     float m_speed;
     bool active;
+    int m_trajectory;
+    glm::vec2 m_direction_unit_vector;
 };
 
 #endif //LASER_HPP

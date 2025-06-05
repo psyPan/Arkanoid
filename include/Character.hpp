@@ -52,7 +52,7 @@ public:
         m_Lasers.clear();
     }
 
-    std::vector<std::shared_ptr<Laser>>& GetLasers() { return m_Lasers; }
+   std::vector<std::shared_ptr<Laser>>& GetLasers(){ return m_Lasers; }
 
     std::shared_ptr<Util::SFX> GetVausBallSound() { return m_VausBallSound; }
 
@@ -64,13 +64,14 @@ public:
     }
 
     // TODO: Add and implement more methods and properties as needed to finish Giraffe Adventure.
+protected:
+    std::vector<std::shared_ptr<Laser>> m_Lasers;
 
 private:
     void ResetPosition() { m_Transform.translation = {0, 0}; }
 
     std::string m_ImagePath;
     Pill::PILL_TYPE m_PillType = Pill::PILL_TYPE::NULL_Pill;
-    std::vector<std::shared_ptr<Laser>> m_Lasers;
     double lastFireTime = 0;
     bool m_StartingState = false;
     std::shared_ptr<Util::SFX> m_VausBallSound;

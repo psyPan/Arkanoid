@@ -124,6 +124,7 @@ void App::Update() {
             laser->Update(m_LevelManager->GetBackgroundImage()->GetScaledSize());
         }
 
+
         // Delete the out of bound lasers.
         DeleteInactiveLasers();
 
@@ -138,6 +139,13 @@ void App::Update() {
         VausHoldBall();
 
         UpdateScoreText();
+
+        if (m_level == 32){
+            DOH_FiringLasers();
+            for (auto& laser: m_DOH->GetLasers()){
+                laser->Update(m_LevelManager->GetBackgroundImage()->GetScaledSize());
+            }
+        }
 
     }
     if (Util::Input::IsKeyUp(Util::Keycode::ESCAPE) ||
@@ -335,6 +343,18 @@ void App::DeleteInactiveLasers(){
             ++it;
         }
     }
+
+    auto& DOH_lasers = m_DOH->GetLasers();
+    for (auto it = DOH_lasers.begin(); it != DOH_lasers.end();){
+        if (!(*it)->IsActive()){
+            (*it)->SetVisible(false);
+            m_Root.RemoveChild(*it);
+            it = DOH_lasers.erase(it);
+        }
+        else{
+            ++it;
+        }
+    }
 }
 
 void App::DeleteInactiveBall(){
@@ -411,6 +431,17 @@ void App::CheckForCollision(){
             bricks.erase(it);
         }
     }
+
+    if (m_level == 32){
+        for (auto& laser: m_DOH->GetLasers()){
+            if (laser->GetAABB().Intersects(m_Vaus->GetAABB())){
+                m_Vaus_get_hit = true;
+                laser->SetActive(false);
+                m_lives--;
+                m_gameIsRunning = false;
+            }
+        }
+    }
 }
 
 void App::UpdateLivesUI(){
@@ -427,7 +458,12 @@ void App::HandleInput(){
     }
     if (!m_gameIsRunning){
         if (!m_ballOutOfBound){
-            m_AnnouncementText->ChangeText("Game is paused.\nPress (P) to play.");
+            if (!m_Vaus_get_hit){
+                m_AnnouncementText->ChangeText("Game is paused.\nPress (P) to play.");
+            }
+            else{
+                m_AnnouncementText->ChangeText("You got hit!\nCurrent lives = " + std::to_string(m_lives)+ "\nPress (R) to resume.");
+            }
         }
     }
     else{
@@ -502,6 +538,15 @@ void App::HandleInput(){
     if (m_ballOutOfBound){
         if (Util::Input::IsKeyUp(Util::Keycode::R)){
             ResumePlayerLosesBall();
+        }
+    }
+    if (m_Vaus_get_hit){
+        if (Util::Input::IsKeyUp(Util::Keycode::R)){
+            m_Vaus_get_hit = false;
+            m_DOH_is_firing = false;
+            m_gameIsRunning = true;
+            Restart(false);
+            InitGame(false);
         }
     }
 
@@ -586,6 +631,11 @@ void App::Restart(bool reset){ // reset is true when the game is resetting from 
     }
     m_Vaus->ClearLasers();
 
+    for (auto& laser: m_DOH->GetLasers()){
+        m_Root.RemoveChild(laser);
+    }
+    m_DOH->ClearLasers();
+
     m_Root.RemoveChild(m_Vaus);
     m_Vaus->SetVisible(false);
     m_Vaus.reset();
@@ -620,7 +670,7 @@ void App::InitGame(bool reset){
     if (reset){
         LOG_TRACE("Start");
         m_lives = 3;
-        m_level = 31;
+        m_level = 32;
         m_gameIsRunning = true;
         m_gameOver = false;
         m_CurrentState = State::UPDATE;
@@ -675,15 +725,20 @@ void App::InitGame(bool reset){
     m_Root.AddChild(m_Ball);
 
     if (m_level == 32){
-        m_DOH_Frame = std::make_shared<Entity>(RESOURCE_DIR"/Image/Background/DOH_Frame.png");
+        m_DOH = std::make_shared<DOH>(RESOURCE_DIR"/Image/DOH/DOH.png");
+        m_DOH->SetZIndex(40);
+        m_DOH->SetPosition(glm::vec2{-10,100});
+        m_DOH->SetVisible(true);
+        m_Root.AddChild(m_DOH);
+
+        m_DOH_Frame = std::make_shared<Entity>(RESOURCE_DIR"/Image/DOH/DOH_Frame.png");
         m_DOH_Frame->SetZIndex(30);
-        m_DOH_Frame->SetPosition(glm::vec2{12,107});
+        m_DOH_Frame->SetPosition(glm::vec2{0,107});
         m_DOH_Frame->SetVisible(true);
         m_Root.AddChild(m_DOH_Frame);
     }
 
     m_GameOverSFX = std::make_shared<Util::SFX>(RESOURCE_DIR"/Sounds/GameOver.wav");
-
 }
 
 glm::vec2 App::RotateVector(const glm::vec2& vec, float angle){
@@ -708,6 +763,32 @@ bool App::AllBrickIsGold(){
         }
     }
     return counter == m_LevelManager->GetBricks().size();
+}
+
+void App::DOH_FiringLasers(){
+    double currentTime = m_Time.GetElapsedTimeMs();
+
+    if (!m_DOH_is_firing){
+        if (currentTime - m_DOH_last_laser_set_time >= 2000){
+            m_DOH_is_firing = true;
+            m_DOH_laser_counter = 0;
+            m_DOH_last_laser_time = currentTime;
+        }
+    }
+    if (m_DOH_is_firing){
+        if (m_DOH_laser_counter < 5){
+            if (currentTime - m_DOH_last_laser_time >= 400){
+                m_DOH->FireLaser(currentTime, m_Root,m_Vaus);
+                m_DOH_last_laser_time = currentTime;
+                m_DOH_laser_counter++;
+            }
+        }
+        else{
+            m_DOH_is_firing = false;
+            m_DOH_last_laser_set_time = currentTime;
+        }
+    }
+
 }
 
 

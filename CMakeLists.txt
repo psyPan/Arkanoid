@@ -52,6 +52,8 @@ add_executable(${PROJECT_NAME}
         include/GameText.hpp
         src/GameText.cpp
         src/Ball.cpp
+        include/DOH.hpp
+        src/DOH.cpp
 
 )
 
