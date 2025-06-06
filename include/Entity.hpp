@@ -58,6 +58,12 @@ public:
                     GetPosition().y + halfHeight, GetPosition().y - halfHeight);
     }
 
+    AABB GetHalfAABB() const{
+        float halfHeight = GetScaledSize().y / 2.0f;
+        return AABB(GetPosition().x, GetPosition().x,
+                    GetPosition().y + halfHeight, GetPosition().y - halfHeight);
+    }
+
 };
 
 #endif //ENTITY_HPP

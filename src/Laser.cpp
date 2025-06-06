@@ -8,8 +8,7 @@ Laser::Laser(const std::string& imagePath, const glm::vec2& pos, float speed, in
 }
 
 void Laser::Update(const glm::vec2& screenSize){
-    float deltaY = (m_trajectory > 0 ? 1.0f : -1.0f) * m_speed;
-    m_Transform.translation += (m_direction_unit_vector * deltaY);
+    m_Transform.translation.y += m_speed;
     // Deactivate if out of screen bounds
     if (IsActive()) {
         float halfHeight = GetScaledSize().y / 2;
@@ -22,15 +21,16 @@ void Laser::Update(const glm::vec2& screenSize){
     }
 }
 
-// void Laser::MoveTowardsVaus(const glm::vec2& DOHPos, const glm::vec2& vausPos, const glm::vec2& screenSize){
-//
-//     if (IsActive()) {
-//         float halfHeight = GetScaledSize().y / 2;
-//         float yPos = m_Transform.translation.y;
-//
-//         if ((m_trajectory > 0 && yPos + halfHeight > screenSize.y / 2 - 24) ||
-//             (m_trajectory < 0 && yPos - halfHeight < -screenSize.y / 2 + 24)) {
-//             active = false;
-//             }
-//     }
-// }
+void Laser::MoveTowardsVaus(const glm::vec2& screenSize){
+    float deltaY = (m_trajectory > 0 ? 1.0f : -1.0f) * m_speed;
+     m_Transform.translation += (m_direction_unit_vector * deltaY);
+    if (IsActive()) {
+        float halfHeight = GetScaledSize().y / 2;
+        float yPos = m_Transform.translation.y;
+
+        if ((m_trajectory > 0 && yPos + halfHeight > screenSize.y / 2 - 24) ||
+            (m_trajectory < 0 && yPos - halfHeight < -screenSize.y / 2 + 24)) {
+            active = false;
+            }
+    }
+}

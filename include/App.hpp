@@ -71,6 +71,10 @@ public:
 
     void DOH_FiringLasers();
 
+    void DOH_HealthBar_Manager();
+
+    void Game_Winning_Manager();
+
 private:
     void ValidTask();
 
@@ -88,13 +92,15 @@ private:
     std::vector<std::shared_ptr<Ball>> m_Balls;
     int m_active_ball_count;
 
-    std::shared_ptr<DOH> m_DOH;
-    std::shared_ptr<Entity> m_DOH_Frame;
+    std::shared_ptr<DOH> m_DOH = nullptr;
+    std::shared_ptr<Entity> m_DOH_health_bar = nullptr;
+    std::shared_ptr<Entity> m_DOH_Frame = nullptr;
 
     int m_DOH_laser_counter = 0;
     double m_DOH_last_laser_time = 0.0;
     double m_DOH_last_laser_set_time = 0.0;
     bool m_DOH_is_firing = true;
+    int m_DOH_HP = 100;
     bool m_Vaus_get_hit = false;
 
     // Player lives display icon
@@ -123,6 +129,8 @@ private:
 
     std::shared_ptr<GameText> m_AnnouncementText;
     std::shared_ptr<Util::SFX> m_GameOverSFX;
+    std::shared_ptr<Util::SFX> m_GameWinningSFX;
+    bool m_gameHasWon = false;
 
     int m_score = 0;
     int m_lastLifeScoreMilestone = 0;

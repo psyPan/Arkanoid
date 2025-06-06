@@ -13,6 +13,8 @@ public:
     void Update(const glm::vec2& screenSize);
 
     void SetDirection(const glm::vec2& direction){ m_direction_unit_vector = direction; };
+
+    void MoveTowardsVaus(const glm::vec2& screenSize);
     bool IsActive() const{
         return active;
     };

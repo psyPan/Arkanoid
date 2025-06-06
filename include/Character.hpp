@@ -36,7 +36,7 @@ public:
 
     void SetPosition(const glm::vec2& Position) { m_Transform.translation = Position; }
 
-    void HandleCollisionWithBall(const std::shared_ptr<Ball>& ball);
+    virtual void HandleCollisionWithBall(const std::shared_ptr<Ball>& ball);
 
     Pill::PILL_TYPE GetCurrentPill() const { return m_PillType; }
 
@@ -60,6 +60,13 @@ public:
         float halfWidth = GetScaledSize().x / 2.0f;
         float halfHeight = GetScaledSize().y / 2.0f;
         return AABB(GetPosition().x - halfWidth, GetPosition().x + halfWidth,
+                    GetPosition().y + halfHeight, GetPosition().y - halfHeight);
+    }
+
+    AABB GetScaledAABB() const{
+        float halfWidth = GetScaledSize().x / 2.0f;
+        float halfHeight = GetScaledSize().y / 2.0f;
+        return AABB(GetPosition().x - halfWidth + 20, GetPosition().x + halfWidth - 20,
                     GetPosition().y + halfHeight, GetPosition().y - halfHeight);
     }
 

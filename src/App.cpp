@@ -59,7 +59,7 @@ void App::Update() {
             if (m_Balls[i]->GetPosition().y + m_Balls[i]->GetScaledSize().y / 2 > (m_LevelManager->GetBackgroundImage()->GetScaledSize().y / 2 - 24)){
                 m_Balls[i]->SetPosition({m_Balls[i]->GetPosition().x, m_LevelManager->GetBackgroundImage()->GetScaledSize().y / 2 - 24 - m_Balls[i]->GetScaledSize().y / 2});
                 m_Balls[i]->SetVelocity(glm::vec2{m_Balls[i]->GetVelocity().x, -m_Balls[i]->GetVelocity().y});
-                if (m_level != 9){
+                if (m_level != 9 && m_level != 32){
                     m_Balls[i]->MaximizeSpeed();
                 }
             }
@@ -124,6 +124,13 @@ void App::Update() {
             laser->Update(m_LevelManager->GetBackgroundImage()->GetScaledSize());
         }
 
+        if (m_level == 32 && m_DOH){
+            DOH_FiringLasers();
+            for (auto& laser: m_DOH->GetLasers()){
+                laser->MoveTowardsVaus(m_LevelManager->GetBackgroundImage()->GetScaledSize());
+            }
+
+        }
 
         // Delete the out of bound lasers.
         DeleteInactiveLasers();
@@ -140,12 +147,6 @@ void App::Update() {
 
         UpdateScoreText();
 
-        if (m_level == 32){
-            DOH_FiringLasers();
-            for (auto& laser: m_DOH->GetLasers()){
-                laser->Update(m_LevelManager->GetBackgroundImage()->GetScaledSize());
-            }
-        }
 
     }
     if (Util::Input::IsKeyUp(Util::Keycode::ESCAPE) ||
@@ -343,16 +344,17 @@ void App::DeleteInactiveLasers(){
             ++it;
         }
     }
-
-    auto& DOH_lasers = m_DOH->GetLasers();
-    for (auto it = DOH_lasers.begin(); it != DOH_lasers.end();){
-        if (!(*it)->IsActive()){
-            (*it)->SetVisible(false);
-            m_Root.RemoveChild(*it);
-            it = DOH_lasers.erase(it);
-        }
-        else{
-            ++it;
+    if (m_level == 32){
+        auto& DOH_lasers = m_DOH->GetLasers();
+        for (auto it = DOH_lasers.begin(); it != DOH_lasers.end();){
+            if (!(*it)->IsActive()){
+                (*it)->SetVisible(false);
+                m_Root.RemoveChild(*it);
+                it = DOH_lasers.erase(it);
+            }
+            else{
+                ++it;
+            }
         }
     }
 }
@@ -433,12 +435,23 @@ void App::CheckForCollision(){
     }
 
     if (m_level == 32){
+
         for (auto& laser: m_DOH->GetLasers()){
-            if (laser->GetAABB().Intersects(m_Vaus->GetAABB())){
+            if (laser->GetHalfAABB().Intersects(m_Vaus->GetAABB())){
                 m_Vaus_get_hit = true;
                 laser->SetActive(false);
                 m_lives--;
                 m_gameIsRunning = false;
+            }
+        }
+        if (!m_Balls.empty()){
+            if (m_DOH->GetScaledAABB().Intersects(m_Balls[0]->GetAABB())){
+                m_DOH->HandleCollisionWithBall(m_Balls[0]);
+                m_DOH_HP -= 5;
+                if (m_DOH_HP <= 0){
+                    Game_Winning_Manager();
+                }
+                DOH_HealthBar_Manager();
             }
         }
     }
@@ -454,16 +467,21 @@ void App::UpdateLivesUI(){
 void App::HandleInput(){
 
     if ((!m_ballOutOfBound) && (Util::Input::IsKeyUp(Util::Keycode::P))){
-        m_gameIsRunning = !m_gameIsRunning;
+        if (!m_gameHasWon){
+            m_gameIsRunning = !m_gameIsRunning;
+        }
     }
     if (!m_gameIsRunning){
-        if (!m_ballOutOfBound){
+        if (!m_ballOutOfBound && !m_gameHasWon){
             if (!m_Vaus_get_hit){
                 m_AnnouncementText->ChangeText("Game is paused.\nPress (P) to play.");
             }
             else{
                 m_AnnouncementText->ChangeText("You got hit!\nCurrent lives = " + std::to_string(m_lives)+ "\nPress (R) to resume.");
             }
+        }
+        if (m_gameHasWon){
+            m_AnnouncementText->ChangeText("You won!\nPress (Esc) to exit.");
         }
     }
     else{
@@ -547,6 +565,7 @@ void App::HandleInput(){
             m_gameIsRunning = true;
             Restart(false);
             InitGame(false);
+            DOH_HealthBar_Manager();
         }
     }
 
@@ -557,6 +576,13 @@ void App::HandleInput(){
             Restart(true);
             InitGame(true);
         }
+    }
+
+    if (Util::Input::IsKeyUp(Util::Keycode::N)){
+        if (m_level < 32)
+            m_level++;
+        Restart(false);
+        InitGame(false);
     }
 
 }
@@ -601,6 +627,16 @@ void App::ResumePlayerLosesBall(){
         }
         m_Vaus->ClearLasers();
     }
+
+    if (m_DOH){
+        m_DOH_is_firing = false;
+        if (!m_DOH->GetLasers().empty()){
+            for (auto& laser: m_DOH->GetLasers()){
+                m_Root.RemoveChild(laser);
+            }
+            m_DOH->ClearLasers();
+        }
+    }
 }
 
 void App::DetectGameOver(){
@@ -631,10 +667,15 @@ void App::Restart(bool reset){ // reset is true when the game is resetting from 
     }
     m_Vaus->ClearLasers();
 
-    for (auto& laser: m_DOH->GetLasers()){
-        m_Root.RemoveChild(laser);
+    if (m_DOH){
+        for (auto& laser: m_DOH->GetLasers()){
+            m_Root.RemoveChild(laser);
+        }
+        m_DOH->ClearLasers();
+
+        m_Root.RemoveChild(m_DOH_health_bar);
+        m_DOH_health_bar.reset();
     }
-    m_DOH->ClearLasers();
 
     m_Root.RemoveChild(m_Vaus);
     m_Vaus->SetVisible(false);
@@ -669,8 +710,8 @@ void App::Restart(bool reset){ // reset is true when the game is resetting from 
 void App::InitGame(bool reset){
     if (reset){
         LOG_TRACE("Start");
-        m_lives = 3;
-        m_level = 32;
+        m_lives = 10;
+        m_level = 0;
         m_gameIsRunning = true;
         m_gameOver = false;
         m_CurrentState = State::UPDATE;
@@ -678,6 +719,8 @@ void App::InitGame(bool reset){
         m_has_Glue = false;
         m_ball_Stucked = false;
         m_active_ball_count = 1;
+        m_Vaus_get_hit = false;
+        m_DOH_HP = 100;
     }
     m_LevelManager = std::make_shared<LevelManager>(m_level);
     m_Root.AddChild(m_LevelManager->GetChild());
@@ -736,9 +779,16 @@ void App::InitGame(bool reset){
         m_DOH_Frame->SetPosition(glm::vec2{0,107});
         m_DOH_Frame->SetVisible(true);
         m_Root.AddChild(m_DOH_Frame);
+
+        m_DOH_health_bar = std::make_shared<Entity>(RESOURCE_DIR"/Image/DOH/HealthBar100.png");
+        m_DOH_health_bar->SetZIndex(30);
+        m_DOH_health_bar->SetPosition(glm::vec2{0,340});
+        m_DOH_health_bar->SetVisible(true);
+        m_Root.AddChild(m_DOH_health_bar);
     }
 
     m_GameOverSFX = std::make_shared<Util::SFX>(RESOURCE_DIR"/Sounds/GameOver.wav");
+    m_GameWinningSFX = std::make_shared<Util::SFX>(RESOURCE_DIR"/Sounds/Winning_Music.mp3");
 }
 
 glm::vec2 App::RotateVector(const glm::vec2& vec, float angle){
@@ -789,6 +839,24 @@ void App::DOH_FiringLasers(){
         }
     }
 
+}
+
+void App::DOH_HealthBar_Manager(){
+    if (m_level == 32){
+        m_DOH_health_bar->SetImage(RESOURCE_DIR"/Image/DOH/HealthBar" + std::to_string(m_DOH_HP) + ".png");
+    }
+}
+
+void App::Game_Winning_Manager(){
+    m_gameIsRunning = false;
+    m_gameHasWon = true;
+    if (!m_DOH->GetLasers().empty()){
+        for (auto& laser: m_DOH->GetLasers()){
+            m_Root.RemoveChild(laser);
+        }
+        m_DOH->ClearLasers();
+    }
+    m_GameWinningSFX->Play();
 }
 
 
