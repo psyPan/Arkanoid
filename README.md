@@ -19,12 +19,11 @@ Arkanoid, the game I try to recreate in this course, is a ball and paddle style 
 ### 遊戲規則
 Vaus
 
-| ![Normal size Vaus](Resources/Image/Vaus/Normal0.png) | Normal size Vaus |
-|-------------------------------------------------------|------------------|
-
-Elongated Vaus
-
-Laser shooting Vaus
+| ![Normal size Vaus](Resources/Image/Vaus/Normal0.png) | Normal size Vaus   |
+|-------------------------------------------------------|--------------------|
+|![Elongate Vaus](Resources/Image/Vaus/Long0.png)      | Elongated Vaus      |
+|-------------------------------------------------------| ------------------ |
+|![Laser Shooting Vaus](Resources/Image/Vaus/Shoot0.png)| Laser shooting Vaus|
 
 Bricks
 In the game, there are 10 kinds of bricks. Each brick has its own points when destroyed.
