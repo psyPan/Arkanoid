@@ -52,7 +52,7 @@ void DOH::HandleCollisionWithBall(const std::shared_ptr<Ball>& ball){
         }
     } else {
         glm::vec2 newPos = ball->GetPosition();
-        newPos.x += (diff.x > 0 ? 1 : -1) * overlapX;
+        // newPos.x += (diff.x > 0 ? 1 : -1) * overlapX;
         ball->SetPosition(newPos);
         if (diff.x > 0) {
             glm::vec2 normalVector = glm::vec2{1,0};

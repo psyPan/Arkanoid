@@ -15,9 +15,12 @@ void App::Start() {
 void App::Update() {
     m_Root.Update();
     HandleInput();
+    Game_Start_Pause();
+
     if (m_gameIsRunning){
         //TODO: do your things here and delete this line <3
         UpdateLivesUI();
+        // Game_Start_Pause();
 
         if (m_LevelManager->GetBricks().empty() || AllBrickIsGold()){
             if (m_level != 32){
@@ -59,7 +62,7 @@ void App::Update() {
             if (m_Balls[i]->GetPosition().y + m_Balls[i]->GetScaledSize().y / 2 > (m_LevelManager->GetBackgroundImage()->GetScaledSize().y / 2 - 24)){
                 m_Balls[i]->SetPosition({m_Balls[i]->GetPosition().x, m_LevelManager->GetBackgroundImage()->GetScaledSize().y / 2 - 24 - m_Balls[i]->GetScaledSize().y / 2});
                 m_Balls[i]->SetVelocity(glm::vec2{m_Balls[i]->GetVelocity().x, -m_Balls[i]->GetVelocity().y});
-                if (m_level != 9 && m_level != 32){
+                if (m_level != 9 && m_level != 31 && m_level != 32){
                     m_Balls[i]->MaximizeSpeed();
                 }
             }
@@ -578,11 +581,16 @@ void App::HandleInput(){
         }
     }
 
+    // Cheat keys
     if (Util::Input::IsKeyUp(Util::Keycode::N)){
         if (m_level < 32)
             m_level++;
         Restart(false);
         InitGame(false);
+    }
+
+    if (Util::Input::IsKeyUp(Util::Keycode::NUM_1)){
+        m_lives++;
     }
 
 }
@@ -689,6 +697,10 @@ void App::Restart(bool reset){ // reset is true when the game is resetting from 
     m_scoreText->SetVisible(false);
     m_scoreText.reset();
 
+    m_Root.RemoveChild(m_levelText);
+    m_levelText->SetVisible(false);
+    m_levelText.reset();
+
     if (reset){
 
         m_Root.RemoveChild(m_Icon);
@@ -710,8 +722,7 @@ void App::Restart(bool reset){ // reset is true when the game is resetting from 
 void App::InitGame(bool reset){
     if (reset){
         LOG_TRACE("Start");
-        m_lives = 10;
-        m_level = 0;
+        m_lives = 5;
         m_gameIsRunning = true;
         m_gameOver = false;
         m_CurrentState = State::UPDATE;
@@ -722,6 +733,9 @@ void App::InitGame(bool reset){
         m_Vaus_get_hit = false;
         m_DOH_HP = 100;
     }
+    m_isStartingLevel = true;
+    m_levelStartTime = 0.0;
+
     m_LevelManager = std::make_shared<LevelManager>(m_level);
     m_Root.AddChild(m_LevelManager->GetChild());
     m_LevelManager->CreateBrick(m_Root);
@@ -759,6 +773,12 @@ void App::InitGame(bool reset){
     m_scoreText->SetZIndex(50);
     m_Root.AddChild(m_scoreText);
 
+    // Level text
+    m_levelText = std::make_shared<GameText>("Level: \n" + std::to_string(m_level + 1), glm::vec2{-480,200}, 18);
+    m_levelText->SetVisible(true);
+    m_levelText->SetZIndex(50);
+    m_Root.AddChild(m_levelText);
+
     // Ball
     auto m_Ball = std::make_shared<Ball>(RESOURCE_DIR"/Image/Ball/ball.png", true, glm::vec2{200,400});
     m_Ball->SetZIndex(50);
@@ -789,6 +809,8 @@ void App::InitGame(bool reset){
 
     m_GameOverSFX = std::make_shared<Util::SFX>(RESOURCE_DIR"/Sounds/GameOver.wav");
     m_GameWinningSFX = std::make_shared<Util::SFX>(RESOURCE_DIR"/Sounds/Winning_Music.mp3");
+    m_GameStartingSFX = std::make_shared<Util::SFX>(RESOURCE_DIR"/Sounds/GameStart.mp3");
+    m_DOH_Laugh_SFX = std::make_shared<Util::SFX>(RESOURCE_DIR"/Sounds/evil-laugh.mp3");
 }
 
 glm::vec2 App::RotateVector(const glm::vec2& vec, float angle){
@@ -858,6 +880,33 @@ void App::Game_Winning_Manager(){
     }
     m_GameWinningSFX->Play();
 }
+
+void App::Game_Start_Pause(){
+    double currentTime = m_Time.GetElapsedTimeMs();
+
+    if (m_isStartingLevel) {
+        m_gameIsRunning = false;
+        m_AnnouncementText->ChangeText("Level " + std::to_string(m_level + 1) + " is starting!");
+        // First time: play sound and set time
+        if (m_levelStartTime == 0.0) {
+            m_levelStartTime = currentTime;
+            if (m_level != 32)
+                m_GameStartingSFX->Play();
+            else
+                m_DOH_Laugh_SFX->Play();
+        }
+
+        // Wait for 2 seconds, then resume
+        if (currentTime - m_levelStartTime >= 2000) {
+            m_gameIsRunning = true;
+            m_isStartingLevel = false;
+            m_levelStartTime = 0.0; // reset
+            m_AnnouncementText->ChangeText("Game is running.\nPress (P) to pause.");
+        }
+    }
+
+}
+
 
 
 void App::End() { // NOLINT(this method will mutate members in the future)

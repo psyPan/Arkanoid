@@ -57,6 +57,7 @@ void Brick::HandleCollisionWithBall(const std::shared_ptr<Ball>& ball) {
     ball->SetVelocity(newVelocity);
 }
 
+
 AABB Brick::GetBrickAABB() const{
     float halfWidth = GetScaledSize().x / 2.0f;
     float halfHeight = GetScaledSize().y / 2.0f;

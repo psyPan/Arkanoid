@@ -29,8 +29,6 @@ public:
 
     void End(); // NOLINT(readability-convert-member-functions-to-static)
 
-    void SetSpawningState(bool isSpawningPill) { this->isSpawningPill = isSpawningPill; }
-
     bool IsSpawningPill() { return isSpawningPill; }
 
     void CreatePill(const Pill::PILL_TYPE& pill, const glm::vec2& pos);
@@ -75,6 +73,8 @@ public:
 
     void Game_Winning_Manager();
 
+    void Game_Start_Pause();
+
 private:
     void ValidTask();
 
@@ -95,6 +95,7 @@ private:
     std::shared_ptr<DOH> m_DOH = nullptr;
     std::shared_ptr<Entity> m_DOH_health_bar = nullptr;
     std::shared_ptr<Entity> m_DOH_Frame = nullptr;
+    std::shared_ptr<Util::SFX> m_DOH_Laugh_SFX = nullptr;
 
     int m_DOH_laser_counter = 0;
     double m_DOH_last_laser_time = 0.0;
@@ -124,6 +125,7 @@ private:
     std::vector<std::shared_ptr<Brick>> bricksToRemove;
     int m_level = 0;
     bool m_gameIsRunning;
+    bool m_gameIsPaused = false;
     bool m_gameOver;
     bool m_ballOutOfBound;
 
@@ -132,9 +134,15 @@ private:
     std::shared_ptr<Util::SFX> m_GameWinningSFX;
     bool m_gameHasWon = false;
 
+    // To pause the game at the start of each level
+    bool m_isStartingLevel = false;
+    double m_levelStartTime = 0.0;
+    std::shared_ptr<Util::SFX> m_GameStartingSFX;
+
     int m_score = 0;
     int m_lastLifeScoreMilestone = 0;
     std::shared_ptr<GameText> m_scoreText;
+    std::shared_ptr<GameText> m_levelText;
 };
 
 #endif
