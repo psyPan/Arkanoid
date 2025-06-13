@@ -18,9 +18,9 @@ the next level. The title ‘Arkanoid’ refers to a doomed mothership from whic
 Arkanoid, the game I try to recreate in this course, is a ball and paddle style game. The name of the paddle is called “Vaus”. At the beginning of each level, the ball is stuck to “Vaus” and when the ‘Space’ key is pressed, the ball is released. The player has to destroy all the bricks(except golden bricks which are indestructible) in each level to move to the next level. When the ball touches the top border, its speed will maximize.
 ### 遊戲規則
 Vaus
-
-| ![Normal size Vaus](Resources/Image/Vaus/Normal0.png)   | Normal size Vaus   |
+| Photo                                                   | Name               |
 |---------------------------------------------------------|--------------------|
+| ![Normal size Vaus](Resources/Image/Vaus/Normal0.png)   | Normal size Vaus   |
 | ![Elongate Vaus](Resources/Image/Vaus/Long0.png)        | Elongated Vaus     |
 | ![Laser Shooting Vaus](Resources/Image/Vaus/Shoot0.png) | Laser shooting Vaus|
 
